@@ -1,0 +1,48 @@
+name: CI/CD Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          set -e
+
+          cd ${{ secrets.SERVER_PROJECT_DIR }}
+
+          # 拉取最新代码
+          git fetch --all
+          git reset --hard origin/master
+
+          # 加载 nvm
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+          # 加载 LIFE_URL
+          export VITE_LIFE_URL=${{ secrets.VITE_LIFE_URL }}
+
+          # Node22 构建
+          nvm use 22 || nvm install 22
+          pnpm install
+          pnpm run build
+
+          # Node18 启动 PM2
+          nvm use 18 || nvm install 18
+          pm2 start ecosystem.config.cjs --env production || pm2 reload ecosystem.config.cjs --env production
+          EOF
