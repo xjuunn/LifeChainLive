@@ -2,7 +2,7 @@
   <div class="toast toast-top toast-center z-9999 w-full max-w-sm pointer-events-none p-4 fixed">
     <TransitionGroup name="toast-anim" tag="div" class="flex flex-col gap-2 w-full items-center">
       <div v-for="toast in toasts" :key="toast.id"
-        class="alert shadow-lg backdrop-blur-md border border-base-content/5 pointer-events-auto flex items-start gap-3 w-auto min-w-[300px]"
+        class="alert shadow-lg backdrop-blur-md border border-base-content/5 pointer-events-auto flex items-start gap-3 w-auto min-w-75"
         :class="{
           'alert-info bg-info/10 text-info border-info/20': toast.type === 'info',
           'alert-success bg-success/10 text-success border-success/20': toast.type === 'success',

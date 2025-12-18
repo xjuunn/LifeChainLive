@@ -65,7 +65,7 @@ const getTypeColor = (type: DialogType | undefined) => {
       </div>
 
       <!-- 2. 内容区域 -->
-      <div class="px-6 py-4 text-base-content/80 text-sm leading-relaxed min-h-[60px]">
+      <div class="px-6 py-4 text-base-content/80 text-sm leading-relaxed min-h-15">
         <div v-if="store.options.html" v-html="store.options.content"></div>
         <p v-else>{{ store.options.content }}</p>
       </div>

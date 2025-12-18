@@ -1,13 +1,7 @@
 const base = "/livekit/live";
 
-// 直播房间类型
-export enum LiveRoomType {
-  'liveroom', // 直播间
-  'voiceroom', // 语聊房
-}
-
 export interface LiveListRequest {
-  type?: LiveRoomType; // 直播房间类型
+  type?: 'voiceroom' | 'liveroom'; // 直播房间类型
   page?: number;
   pageSize?: number;
 }
