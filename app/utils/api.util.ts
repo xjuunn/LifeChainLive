@@ -106,9 +106,12 @@ export default Request
  * @param res 错误的响应
  * @returns 错误信息
  */
-function errorHandler(res: ApiResponse<any>): string {
-  const code = res.code.toString()
-  let message = res.message || '请求出错'
+function errorHandler(res: ApiResponse<any> | undefined): string {
+  if (!res) {
+    return '网络请求失败'
+  }
+  const code = res.code?.toString() || 'unknown'
+  let message = res.message || res.error || '请求出错'
   // 错误处理
 
   return message

@@ -1,3 +1,5 @@
+import { api } from '~/utils/api.util';
+
 const base = "/livekit/live";
 
 export interface LiveListRequest {
@@ -46,7 +48,7 @@ export function list(data?: LiveListRequest) {
  * @param roomId 房间ID
  */
 export function info(roomId: string) {
-  return api.get<LiveRoom>('/info', { roomId })
+  return api.get<LiveRoom>(base + '/info', { roomId })
 }
 
 /**
@@ -66,5 +68,5 @@ export function join(userId: string, roomId: string) {
     roomId: string;
     // 房间类型：`liveroom` 或 `voiceroom`
     roomType: string;
-  }>('/join', { userId, roomId })
+  }>(base + '/join', { userId, roomId })
 }
