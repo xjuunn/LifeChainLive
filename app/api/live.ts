@@ -1,4 +1,4 @@
-const base = "/livekit/live";
+const base = "/live";
 
 export interface LiveListRequest {
   type?: 'voiceroom' | 'liveroom'; // 直播房间类型
