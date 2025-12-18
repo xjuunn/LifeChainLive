@@ -29,6 +29,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.2))
+      '@tencentcloud/tui-core':
+        specifier: ^2.5.1
+        version: 2.5.1
       '@vueuse/nuxt':
         specifier: 14.1.0
         version: 14.1.0(magicast@0.5.1)(nuxt@4.2.2(@parcel/watcher@2.5.1)(@types/node@25.0.3)(@vue/compiler-sfc@3.5.25)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.2(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.5)(terser@5.44.1)(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.2))(yaml@2.8.2))(vue@3.5.25(typescript@5.9.3))
@@ -55,7 +58,7 @@ importers:
         version: 4.1.18
       tuikit-atomicx-vue3:
         specifier: ^4.5.1
-        version: 4.5.1(@tencentcloud/chat-uikit-engine@2.5.7)(@tencentcloud/chat@3.6.1)(@tencentcloud/tuiroom-engine-js@3.5.1-beta.1)(@tencentcloud/uikit-base-component-vue3@1.3.1(vue@3.5.25(typescript@5.9.3)))(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
+        version: 4.5.1(@tencentcloud/chat-uikit-engine@2.5.7)(@tencentcloud/chat@3.6.1)(@tencentcloud/tui-core@2.5.1)(@tencentcloud/tuiroom-engine-js@3.5.1-beta.1)(@tencentcloud/uikit-base-component-vue3@1.3.1(vue@3.5.25(typescript@5.9.3)))(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
       vue:
         specifier: ^3.5.25
         version: 3.5.25(typescript@5.9.3)
@@ -1860,6 +1863,9 @@ packages:
 
   '@tencentcloud/chat@3.6.1':
     resolution: {integrity: sha512-YKftPfO2Mzo/RhSmUq2806FrB2ZB9AiuVmhHupxXtG6g8RMHTJICQulp6z+3bBzU7qko9BancR8rtvfdpDTpmQ==}
+
+  '@tencentcloud/tui-core@2.5.1':
+    resolution: {integrity: sha512-aXZG0INkV9WvFUHgmVQRibCs10r2u/oVb8qAEjW3maytBiLWOJQiK7dzshK9fnfadJAWQ027cpR8lCKz5r5Tlw==}
 
   '@tencentcloud/tuiroom-engine-js@3.5.1-beta.1':
     resolution: {integrity: sha512-hunUL9I/uJO9BI3rBe+joO2QxBNyDldz9oDzVMOduaoq2zJj+m9bvj6h6ZMgTstbCf0kF3SUDaIxOldXjYBa1Q==}
@@ -6697,6 +6703,12 @@ snapshots:
 
   '@tencentcloud/chat@3.6.1': {}
 
+  '@tencentcloud/tui-core@2.5.1':
+    dependencies:
+      '@tencentcloud/chat': 3.6.1
+      tim-profanity-filter-plugin: 1.1.0
+      tim-upload-plugin: 1.4.3
+
   '@tencentcloud/tuiroom-engine-js@3.5.1-beta.1':
     dependencies:
       '@tencentcloud/chat': 3.5.9
@@ -6711,117 +6723,117 @@ snapshots:
 
   '@tencentcloud/universal-api@2.4.0': {}
 
-  '@tiptap/core@2.27.1(@tiptap/pm@2.27.1)':
+  '@tiptap/core@2.27.1(@tiptap/pm@3.13.0)':
     dependencies:
-      '@tiptap/pm': 2.27.1
+      '@tiptap/pm': 3.13.0
 
   '@tiptap/extension-blockquote@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-bold@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
-  '@tiptap/extension-bubble-menu@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)':
+  '@tiptap/extension-bubble-menu@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
       tippy.js: 6.3.7
 
   '@tiptap/extension-bullet-list@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-code-block@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 2.27.1
 
   '@tiptap/extension-code@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-document@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-dropcursor@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 2.27.1
 
-  '@tiptap/extension-floating-menu@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)':
+  '@tiptap/extension-floating-menu@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
       tippy.js: 6.3.7
 
   '@tiptap/extension-gapcursor@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 2.27.1
 
   '@tiptap/extension-hard-break@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-heading@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-history@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 2.27.1
 
   '@tiptap/extension-horizontal-rule@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 2.27.1
 
-  '@tiptap/extension-image@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))':
+  '@tiptap/extension-image@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-italic@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-list-item@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
-  '@tiptap/extension-mention@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))':
+  '@tiptap/extension-mention@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
-      '@tiptap/suggestion': 2.11.5(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)
+      '@tiptap/suggestion': 2.11.5(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-ordered-list@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-paragraph@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
-  '@tiptap/extension-placeholder@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)':
+  '@tiptap/extension-placeholder@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
 
   '@tiptap/extension-strike@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-text-style@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/extension-text@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
 
   '@tiptap/pm@2.27.1':
     dependencies:
@@ -6867,7 +6879,7 @@ snapshots:
 
   '@tiptap/starter-kit@2.27.1':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/extension-blockquote': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
       '@tiptap/extension-bold': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
       '@tiptap/extension-bullet-list': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
@@ -6889,16 +6901,16 @@ snapshots:
       '@tiptap/extension-text-style': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
       '@tiptap/pm': 2.27.1
 
-  '@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)':
+  '@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
 
-  '@tiptap/vue-3@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(vue@3.5.25(typescript@5.9.3))':
+  '@tiptap/vue-3@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(vue@3.5.25(typescript@5.9.3))':
     dependencies:
-      '@tiptap/core': 2.27.1(@tiptap/pm@2.27.1)
-      '@tiptap/extension-bubble-menu': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)
-      '@tiptap/extension-floating-menu': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)
+      '@tiptap/core': 2.27.1(@tiptap/pm@3.13.0)
+      '@tiptap/extension-bubble-menu': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)
+      '@tiptap/extension-floating-menu': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
       vue: 3.5.25(typescript@5.9.3)
 
@@ -9835,20 +9847,21 @@ snapshots:
 
   tsml@1.0.1: {}
 
-  tuikit-atomicx-vue3@4.5.1(@tencentcloud/chat-uikit-engine@2.5.7)(@tencentcloud/chat@3.6.1)(@tencentcloud/tuiroom-engine-js@3.5.1-beta.1)(@tencentcloud/uikit-base-component-vue3@1.3.1(vue@3.5.25(typescript@5.9.3)))(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3)):
+  tuikit-atomicx-vue3@4.5.1(@tencentcloud/chat-uikit-engine@2.5.7)(@tencentcloud/chat@3.6.1)(@tencentcloud/tui-core@2.5.1)(@tencentcloud/tuiroom-engine-js@3.5.1-beta.1)(@tencentcloud/uikit-base-component-vue3@1.3.1(vue@3.5.25(typescript@5.9.3)))(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@tencentcloud/chat': 3.6.1
       '@tencentcloud/chat-uikit-engine': 2.5.7
+      '@tencentcloud/tui-core': 2.5.1
       '@tencentcloud/tuiroom-engine-js': 3.5.1-beta.1
       '@tencentcloud/uikit-base-component-vue3': 1.3.1(vue@3.5.25(typescript@5.9.3))
       '@tencentcloud/universal-api': 2.4.0
-      '@tiptap/extension-image': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))
-      '@tiptap/extension-mention': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))
-      '@tiptap/extension-placeholder': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)
+      '@tiptap/extension-image': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
+      '@tiptap/extension-mention': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(@tiptap/suggestion@2.11.5(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0))
+      '@tiptap/extension-placeholder': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)
       '@tiptap/pm': 3.13.0
       '@tiptap/starter-kit': 2.27.1
-      '@tiptap/suggestion': 2.11.5(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)
-      '@tiptap/vue-3': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(vue@3.5.25(typescript@5.9.3))
+      '@tiptap/suggestion': 2.11.5(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)
+      '@tiptap/vue-3': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@3.13.0)(vue@3.5.25(typescript@5.9.3))
       '@vue/tsconfig': 0.7.0(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
       axios: 1.13.2
       classnames: 2.5.1

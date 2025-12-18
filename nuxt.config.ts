@@ -1,18 +1,64 @@
 import tailwindcss from "@tailwindcss/vite";
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  vite: {
-    plugins: [tailwindcss() as any],
-  },
+  ssr: false,
+
   css: ["./app/assets/app.css"],
   components: true,
+
+  build: {
+    transpile: ['tuikit-atomicx-vue3']
+  },
+
+  vite: {
+    plugins: [tailwindcss() as any],
+    resolve: {
+      alias: {
+        '@tencentcloud/chat': require.resolve('@tencentcloud/chat'),
+        '@tencentcloud/uikit-base-component-vue3': require.resolve('@tencentcloud/uikit-base-component-vue3'),
+        '@tencentcloud/tui-core': require.resolve('@tencentcloud/tui-core'),
+        '@tencentcloud/tuiroom-engine-js': require.resolve('@tencentcloud/tuiroom-engine-js'),
+        '@tencentcloud/chat-uikit-engine': require.resolve('@tencentcloud/chat-uikit-engine')
+      }
+    },
+    optimizeDeps: {
+      include: [
+        'tuikit-atomicx-vue3',
+        '@tencentcloud/chat',
+        '@tencentcloud/uikit-base-component-vue3',
+        // 新增
+        '@tencentcloud/tui-core',
+        '@tencentcloud/tuiroom-engine-js',
+        '@tencentcloud/chat-uikit-engine',
+        'tim-upload-plugin',
+        'tim-profiler-plugin'
+      ]
+    },
+
+    build: {
+      commonjsOptions: {
+        transformMixedEsModules: true,
+        include: [
+          /@tencentcloud/,
+          /tuikit-atomicx-vue3/,
+          /node_modules/
+        ]
+      }
+    }
+  },
+
   imports: {
     dirs: [
       'stores/**',
       'utils/**',
     ]
   },
+
   app: {
     head: {
       link: [
@@ -22,9 +68,7 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'layout', mode: 'out-in' }
   },
-  build: {
-    transpile: ['gsap'],
-  },
+
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'zh-CN',
@@ -40,11 +84,13 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' }
     ]
   },
+
   runtimeConfig: {
     public: {
       life_url: process.env.VITE_LIFE_URL
     }
   },
+
   nitro: {
     routeRules: {
       '/bg.life.tires/**': {
@@ -52,6 +98,7 @@ export default defineNuxtConfig({
       }
     }
   },
+
   modules: [
     '@nuxt/icon',
     '@nuxt/image',
