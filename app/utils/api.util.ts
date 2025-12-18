@@ -111,7 +111,7 @@ function errorHandler(res: ApiResponse<any> | undefined): string {
     return '网络请求失败'
   }
   const code = res.code?.toString() || 'unknown'
-  let message = res.message || res.error || '请求出错'
+  let message = res.message || res.error?.message || '请求出错'
   // 错误处理
 
   return message

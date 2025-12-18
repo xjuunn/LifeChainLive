@@ -31,7 +31,6 @@ export default defineNuxtConfig({
         'tuikit-atomicx-vue3',
         '@tencentcloud/chat',
         '@tencentcloud/uikit-base-component-vue3',
-        // 新增
         '@tencentcloud/tui-core',
         '@tencentcloud/tuiroom-engine-js',
         '@tencentcloud/chat-uikit-engine',
