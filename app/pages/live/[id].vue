@@ -3,53 +3,52 @@
     <div class="relative w-full h-[40vh] lg:h-full lg:flex-1 bg-gray-900 group/player overflow-hidden">
       <div class="absolute inset-0 z-0">
         <ClientOnly>
-          <template v-if="roomInfo">
-            <LivePlayer v-if="roomInfo.roomType === 'liveroom'" :room-id="roomId" @loaded="loading = false" />
+          <LivePlayer :room-id="roomId" @loaded="loading = false" class="h-full w-full" />
+          <div v-if="isVoiceRoom"
+            class="absolute inset-0 z-10 flex flex-col items-center justify-center overflow-hidden bg-gray-900">
+            <div class="absolute inset-0 z-0">
+              <NuxtImg :src="roomInfo?.coverUrl || roomInfo?.ownerAvatar"
+                class="h-full w-full object-cover opacity-30 blur-2xl scale-110" />
+              <div class="absolute inset-0 bg-black/40"></div>
+            </div>
 
-            <div v-else class="relative h-full w-full flex flex-col items-center justify-center overflow-hidden">
-              <div class="absolute inset-0 z-0">
-                <NuxtImg :src="roomInfo.coverUrl || roomInfo.ownerAvatar"
-                  class="h-full w-full object-cover opacity-30 blur-2xl scale-110" />
-                <div class="absolute inset-0 bg-black/40"></div>
-              </div>
-
-              <div class="relative z-10 flex flex-col items-center gap-6 p-6">
-                <div class="relative">
-                  <div
-                    class="absolute -inset-4 rounded-full border border-primary/30 animate-[ping_3s_linear_infinite] opacity-50">
-                  </div>
-                  <div
-                    class="absolute -inset-8 rounded-full border border-primary/10 animate-[ping_4s_linear_infinite_1s] opacity-30">
-                  </div>
-
-                  <div
-                    class="w-24 h-24 lg:w-32 lg:h-32 rounded-full shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] overflow-hidden relative bg-base-300">
-                    <NuxtImg :src="roomInfo.ownerAvatar" class="h-full w-full object-cover" />
-                  </div>
-
-                  <div
-                    class="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-black/50 backdrop-blur-sm">
-                    <Icon name="mingcute:mic-fill" class="text-xl" />
-                  </div>
+            <div class="relative z-10 flex flex-col items-center gap-8 p-6">
+              <div class="relative">
+                <div
+                  class="absolute -inset-4 rounded-full border border-primary/30 animate-[ping_3s_linear_infinite] opacity-50">
+                </div>
+                <div
+                  class="absolute -inset-8 rounded-full border border-primary/10 animate-[ping_4s_linear_infinite_1s] opacity-30">
                 </div>
 
-                <div class="text-center space-y-2 max-w-md">
-                  <h2 class="text-2xl font-bold text-white drop-shadow-md line-clamp-2">
-                    {{ roomInfo.title || t('detail.voice_room') }}
-                  </h2>
-                  <div
-                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-inner">
-                    <div class="flex gap-1 items-end h-3">
-                      <span class="w-1 bg-success animate-[music-bar_0.6s_ease-in-out_infinite] h-2"></span>
-                      <span class="w-1 bg-success animate-[music-bar_0.8s_ease-in-out_infinite] h-3"></span>
-                      <span class="w-1 bg-success animate-[music-bar_1.0s_ease-in-out_infinite] h-1"></span>
-                    </div>
-                    <span class="text-xs text-white/90 font-medium tracking-wide">{{ t('detail.on_air') }}</span>
+                <div
+                  class="w-28 h-28 lg:w-40 lg:h-40 rounded-full shadow-[0_0_40px_rgba(var(--primary-rgb),0.4)] overflow-hidden relative bg-base-300 ring-4 ring-primary/20">
+                  <NuxtImg :src="roomInfo?.ownerAvatar" class="h-full w-full object-cover" />
+                </div>
+
+                <div
+                  class="absolute -bottom-3 -right-3 bg-primary text-white p-3 rounded-full shadow-xl border-4 border-gray-900/50 backdrop-blur-sm">
+                  <Icon name="mingcute:mic-fill" class="text-2xl" />
+                </div>
+              </div>
+
+              <div class="text-center space-y-3 max-w-lg">
+                <h2 class="text-3xl font-bold text-white drop-shadow-lg line-clamp-2 leading-tight">
+                  {{ roomInfo?.title || t('detail.voice_room') }}
+                </h2>
+                <div
+                  class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-lg">
+                  <div class="flex gap-1 items-end h-4">
+                    <span class="w-1 bg-success animate-[music-bar_0.6s_ease-in-out_infinite] h-2"></span>
+                    <span class="w-1 bg-success animate-[music-bar_0.8s_ease-in-out_infinite] h-3"></span>
+                    <span class="w-1 bg-success animate-[music-bar_1.0s_ease-in-out_infinite] h-1"></span>
+                    <span class="w-1 bg-success animate-[music-bar_0.7s_ease-in-out_infinite] h-2.5"></span>
                   </div>
+                  <span class="text-sm text-white/90 font-medium tracking-wide">{{ t('detail.on_air') }}</span>
                 </div>
               </div>
             </div>
-          </template>
+          </div>
 
           <template #fallback>
             <div class="flex h-full w-full items-center justify-center bg-gray-950 text-white">
@@ -63,7 +62,7 @@
       </div>
 
       <div
-        class="absolute left-0 top-0 z-20 w-full bg-linear-to-b from-black/80 via-black/40 to-transparent p-4 transition-opacity duration-300 sm:opacity-0 sm:group-hover/player:opacity-100 pointer-events-none">
+        class="absolute left-0 top-0 z-20 w-full bg-gradient-to-b from-black/80 via-black/40 to-transparent p-4 transition-opacity duration-300 sm:opacity-0 sm:group-hover/player:opacity-100 pointer-events-none">
         <button
           class="btn btn-circle btn-sm bg-white/10 border-white/5 text-white backdrop-blur-md hover:bg-white/20 hover:scale-105 transition-all pointer-events-auto"
           @click="handleBack">
@@ -73,13 +72,13 @@
     </div>
 
     <div
-      class="relative z-20 flex flex-1 lg:flex-none lg:w-100 flex-col bg-base-100 shadow-2xl border-l border-base-content/5 overflow-hidden h-[60vh] lg:h-full">
+      class="relative z-20 flex flex-1 lg:flex-none lg:w-[400px] flex-col bg-base-100 shadow-2xl border-l border-base-content/5 overflow-hidden h-[60vh] lg:h-full">
       <div v-if="pending" class="flex flex-1 flex-col p-4 gap-4 animate-pulse">
         <div class="flex items-center gap-3 border-b border-base-content/5 pb-4">
-          <div class="w-10 h-10 rounded-full bg-base-200"></div>
+          <div class="w-12 h-12 rounded-full bg-base-200"></div>
           <div class="flex-1 space-y-2">
-            <div class="h-4 w-24 bg-base-200 rounded"></div>
-            <div class="h-3 w-16 bg-base-200 rounded"></div>
+            <div class="h-4 w-32 bg-base-200 rounded"></div>
+            <div class="h-3 w-20 bg-base-200 rounded"></div>
           </div>
         </div>
         <div class="flex-1 bg-base-200/30 rounded-xl"></div>
@@ -91,7 +90,7 @@
           <div class="flex items-center gap-3 overflow-hidden">
             <div class="avatar">
               <div
-                class="w-10 h-10 rounded-full shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300 overflow-hidden">
+                class="w-10 h-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100 shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300 overflow-hidden">
                 <img :src="getAvatarUrl(roomInfo.ownerAvatar, roomInfo.ownerId)" class="object-cover w-full h-full"
                   alt="anchor" />
               </div>
@@ -154,6 +153,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
@@ -180,6 +180,8 @@ const { data: roomInfo, pending, error } = await useAsyncData<LiveRoom>(
   () => LiveApi.info(roomId.value).then(res => res.data),
   { watch: [roomId] }
 )
+
+const isVoiceRoom = computed(() => roomInfo.value?.roomType === 'voiceroom')
 
 const getAvatarUrl = (url?: string, seed?: string) => {
   if (url && url.startsWith('http')) return url
@@ -233,6 +235,7 @@ useHead({
   title: computed(() => roomInfo.value?.title || t('detail.live_room')),
 })
 </script>
+
 <style scoped>
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 20px);
@@ -250,6 +253,7 @@ useHead({
   }
 }
 </style>
+
 <i18n lang="json">{
   "zh-CN": {
     "detail": {
