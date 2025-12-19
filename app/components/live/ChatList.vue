@@ -2,56 +2,27 @@
   <div class="flex h-full flex-col overflow-hidden bg-base-100/30">
     <div ref="scrollContainer" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 scrollbar-hidden">
       <div
-        class="animate-fade-in-up rounded-xl bg-primary/10 p-3 text-sm text-base-content/90 backdrop-blur-sm border border-primary/10">
+        class="animate-fade-in-up rounded-xl bg-primary/10 p-3 text-sm text-base-content/90 backdrop-blur-sm border border-primary/10 shadow-sm">
         <h2 class="mb-1 font-bold text-primary flex items-center gap-1.5 text-xs sm:text-sm">
           <Icon name="mingcute:announcement-line" />
           {{ t('detail.notice') }}
         </h2>
         <p class="leading-relaxed text-xs sm:text-sm">{{ t('detail.welcome') }}</p>
       </div>
-
-      <TransitionGroup name="list">
-        <div v-for="msg in messageList" :key="msg.sequence" class="flex items-start gap-2.5 sm:gap-3 group">
-          <div class="avatar mt-0.5 flex-shrink-0">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-1 ring-base-content/10 bg-base-300">
-              <img :src="getAvatarUrl(msg.sender?.avatarUrl, msg.sender?.userId)" class="object-cover w-full h-full"
-                loading="lazy" alt="avatar" />
-            </div>
-          </div>
-
-          <div class="flex flex-col max-w-[85%]">
-            <div class="flex items-center gap-2 mb-1 flex-wrap">
-              <span class="text-xs text-base-content/60 font-medium">
-                {{ msg.sender?.userName || msg.sender?.userId || t('detail.guest') }}
-              </span>
-
-              <span v-if="isAnchor(msg.sender?.userId)"
-                class="badge badge-xs sm:badge-sm badge-primary border-none gap-1 font-bold shadow-sm shadow-primary/30">
-                <Icon name="mingcute:mic-fill" class="text-[10px]" />
-                {{ t('detail.anchor') }}
-              </span>
-              <span v-else
-                class="badge badge-xs badge-ghost text-[10px] text-base-content/40 border-base-content/10">LV.1</span>
-            </div>
-
-            <div class="relative rounded-2xl rounded-tl-none px-3 py-2 text-sm shadow-sm border break-words" :class="isAnchor(msg.sender?.userId)
-              ? 'bg-primary/10 border-primary/20 text-base-content'
-              : 'bg-base-100 border-base-content/5 text-base-content/90'">
-              {{ msg.textContent || t('detail.unknown_msg') }}
-            </div>
-          </div>
-        </div>
+      <TransitionGroup name="list" tag="div" class="space-y-4 pb-2">
+        <MessageItem v-for="msg in messageList" :key="msg.sequence" :message="msg" :owner-id="ownerId" />
       </TransitionGroup>
 
-      <div ref="bottomRef" class="h-1"></div>
+      <div ref="bottomRef" class="h-1 w-full"></div>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { useBarrageState } from 'tuikit-atomicx-vue3'
 
-const props = defineProps<{
+const MessageItem = defineAsyncComponent(() => import('./ChatItem.vue'))
+
+defineProps<{
   ownerId: string
 }>()
 
@@ -60,25 +31,19 @@ const { messageList } = useBarrageState()
 const scrollContainer = ref<HTMLElement | null>(null)
 const bottomRef = ref<HTMLElement | null>(null)
 
-const isAnchor = (userId?: string) => {
-  return userId && props.ownerId && userId === props.ownerId
-}
-
-const getAvatarUrl = (url?: string, seed?: string) => {
-  if (url && url.startsWith('http')) return url
-  return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed || Math.random()}`
-}
-
 const scrollToBottom = async (smooth = true) => {
   await nextTick()
   if (bottomRef.value) {
-    bottomRef.value.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' })
+    bottomRef.value.scrollIntoView({
+      behavior: smooth ? 'smooth' : 'auto',
+      block: 'end'
+    })
   }
 }
 
 watch(messageList, (newVal, oldVal) => {
   if (newVal.length > (oldVal?.length || 0)) {
-    scrollToBottom()
+    scrollToBottom(true)
   }
 }, { deep: true })
 
@@ -86,7 +51,6 @@ onMounted(() => {
   scrollToBottom(false)
 })
 </script>
-
 <style scoped>
 .scrollbar-hidden {
   scrollbar-width: none;
@@ -97,9 +61,13 @@ onMounted(() => {
   display: none;
 }
 
-.list-enter-active,
-.list-leave-active {
+.list-enter-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-leave-active {
+  transition: all 0.2s cubic-bezier(0.4, 0, 1, 1);
+  position: absolute;
 }
 
 .list-enter-from {
@@ -128,7 +96,6 @@ onMounted(() => {
   }
 }
 </style>
-
 <i18n lang="json">{
   "zh-CN": {
     "detail": {
