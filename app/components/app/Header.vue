@@ -3,10 +3,10 @@
     class="sticky top-0 z-40 w-full border-b border-base-content/5 bg-base-100/80 backdrop-blur-md transition-all">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
       <div class="flex items-center gap-2 cursor-pointer" @click="navigateTo('/live')">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-content">
-          <Icon name="mingcute:live-photo-fill" class="text-xl" />
+        <div class="flex h-8 w-8 items-center justify-center rounded-full text-primary-content">
+          <img src="/favicon.ico" alt="logo">
         </div>
-        <span class="text-xl font-bold tracking-tight text-base-content">LifeChainLive</span>
+        <span class="text-xl font-bold tracking-tight text-base-content">{{ t('header.title') }}</span>
       </div>
 
       <div class="flex items-center gap-3">
@@ -36,4 +36,23 @@
 <script setup lang="ts">
 const { isDark, toggleTheme } = useThemeStore()
 const { locale, locales, changeLocale, currentLocaleShort } = useAppI18n()
+const { t } = useI18n();
 </script>
+
+<i18n lang="json">{
+  "zh-CN": {
+    "header": {
+      "title": "LifeChain 社区直播"
+    }
+  },
+  "zh-TW": {
+    "header": {
+      "title": "LifeChain 社區直播"
+    }
+  },
+  "en": {
+    "header": {
+      "title": "LifeChain Community Live"
+    }
+  }
+}</i18n>
