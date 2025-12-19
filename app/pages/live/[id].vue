@@ -1,6 +1,8 @@
 <template>
   <div class="flex h-[100dvh] w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
+
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
+
       <ClientOnly>
         <LivePlayer :room-id="roomId" @loaded="loading = false" class="absolute inset-0 w-full h-full object-contain"
           :class="{ 'opacity-0 pointer-events-none': isVoiceRoom }" />
@@ -103,10 +105,10 @@
         </div>
 
         <div class="flex-none border-t border-base-content/5 bg-base-100 p-3 lg:p-4 pb-safe z-10">
-          <div class="flex gap-2 items-center relative">
+          <div class="flex gap-2 items-center mb-4 relative">
             <div class="relative flex-1 group transition-all duration-300 focus-within:scale-[1.01]">
-              <input v-model="textContent" type="text" :placeholder="t('detail.say_something')"
-                class="input input-bordered w-full rounded-full bg-base-200/50 pl-4 pr-12 focus:outline-none focus:bg-base-100 focus:border-primary transition-all text-sm h-10"
+              <input ref="inputRef" v-model="textContent" type="text" :placeholder="t('detail.say_something')"
+                class="input input-bordered w-full rounded-md bg-base-200/50 pl-4 pr-12 focus:outline-none focus:bg-base-100 focus:border-primary transition-all text-sm h-10"
                 :disabled="isSending" @keydown.enter="handleSend" />
               <span v-if="textContent.length > 0"
                 class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-base-content/40 font-mono">
@@ -137,12 +139,12 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
 import { useBarrageState } from 'tuikit-atomicx-vue3'
 definePageMeta({ layout: 'empty' })
-
 const LivePlayer = defineAsyncComponent(() => import('~/components/live/Player.vue'))
 const LiveChatList = defineAsyncComponent(() => import('~/components/live/ChatList.vue'))
 const SeatGrid = defineAsyncComponent(() => import('~/components/live/SeatGrid.vue'))
@@ -157,6 +159,7 @@ const roomId = computed(() => route.params.id as string)
 const loading = ref(true)
 const textContent = ref('')
 const isSending = ref(false)
+const inputRef = ref<HTMLInputElement | null>(null)
 
 const { sendTextMessage } = useBarrageState()
 
@@ -211,6 +214,8 @@ const handleSend = async () => {
     }
   } finally {
     isSending.value = false
+    await nextTick()
+    inputRef.value?.focus()
   }
 }
 
@@ -220,6 +225,7 @@ useHead({
   title: computed(() => roomInfo.value?.title || t('detail.live_room')),
 })
 </script>
+
 <style scoped>
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 20px);
