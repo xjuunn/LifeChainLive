@@ -14,7 +14,7 @@
         <span v-if="isAnchor"
           class="badge badge-xs sm:badge-sm badge-primary border-none gap-1 font-bold shadow-sm shadow-primary/30">
           <Icon name="mingcute:mic-fill" class="text-[10px]" />
-          {{ t('detail.anchor') }}
+          {{ $t('detail.anchor') }}
         </span>
 
         <span v-else
@@ -36,10 +36,15 @@ const props = defineProps<{
   ownerId: string
 }>()
 
-const { t } = useI18n()
+const guestText = computed(() => $t('detail.guest'))
+const unknownText = computed(() => $t('detail.unknown_msg'))
 
 const isAnchor = computed(() => {
-  return props.message.sender?.userId && props.ownerId && props.message.sender.userId === props.ownerId
+  return (
+    props.message.sender?.userId &&
+    props.ownerId &&
+    props.message.sender.userId === props.ownerId
+  )
 })
 
 const avatar = computed(() => {
@@ -50,34 +55,50 @@ const avatar = computed(() => {
 })
 
 const senderName = computed(() => {
-  return props.message.sender?.userName || props.message.sender?.userId || t('detail.guest')
+  return (
+    props.message.sender?.userName ||
+    props.message.sender?.userId ||
+    guestText.value
+  )
 })
 
 const bubbleClass = computed(() => {
-  if (isAnchor.value) {
-    return 'bg-primary/10 border-primary/20 text-base-content'
-  }
-  return 'bg-white dark:bg-base-200 border-base-content/5 text-base-content/90'
+  return isAnchor.value
+    ? 'bg-primary/10 border-primary/20 text-base-content'
+    : 'bg-white dark:bg-base-200 border-base-content/5 text-base-content/90'
 })
 
 const renderContent = computed(() => {
   const { message } = props
 
   if (message.textContent !== undefined) {
-    return () => <span class="whitespace-pre-wrap break-all">{message.textContent}</span>
+    return () => (
+      <span class="whitespace-pre-wrap break-all">
+        {message.textContent}
+      </span>
+    )
   }
 
   if (message.imageInfo) {
     return () => (
       <div class="max-w-50 rounded-lg overflow-hidden">
-        <img src={message.imageInfo.url} class="w-full h-auto" loading="lazy" />
+        <img
+          src={message.imageInfo.url}
+          class="w-full h-auto"
+          loading="lazy"
+        />
       </div>
     )
   }
 
-  return () => <span class="italic opacity-50 text-xs">{t('detail.unknown_msg')}</span>
+  return () => (
+    <span class="italic opacity-50 text-xs">
+      {unknownText.value}
+    </span>
+  )
 })
 </script>
+
 <style scoped>
 .animate-fade-in-up {
   animation: fadeInUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
