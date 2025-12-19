@@ -1,141 +1,72 @@
 <template>
-  <div class="flex items-start gap-3 w-full group animate-fade-in-up">
-    <div class="avatar mt-0.5 shrink-0 cursor-pointer transition-transform active:scale-95">
-      <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-1 ring-base-content/10 bg-base-300 shadow-sm overflow-hidden">
-        <NuxtImg :src="avatar" class="object-cover w-full h-full" loading="lazy" alt="avatar" />
+  <div class="relative flex flex-col items-center gap-2 group w-full">
+    <div class="relative transition-all duration-300 transform group-hover:scale-105">
+      <div
+        class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full relative z-10 flex items-center justify-center overflow-hidden border-2"
+        :class="[
+          isSpeaking ? 'border-success shadow-[0_0_20px_rgba(var(--success-rgb),0.6)]' : 'border-white/10 group-hover:border-white/30',
+          seat.isLocked ? 'bg-base-300/50' : 'bg-base-200/30'
+        ]">
+        <template v-if="hasUser">
+          <NuxtImg :src="avatarUrl" class="w-full h-full object-cover" loading="lazy" :alt="seat.userName" />
+          <div v-if="isMuted" class="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
+            <div class="bg-black/60 p-1 rounded-full border border-white/10">
+              <Icon name="mingcute:mic-off-fill" class="text-error text-xs sm:text-base" />
+            </div>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="text-white/20 flex flex-col items-center justify-center gap-1">
+            <Icon v-if="seat.isLocked" name="mingcute:lock-fill" class="text-lg sm:text-2xl" />
+            <Icon v-else name="mingcute:sofa-line" class="text-lg sm:text-2xl" />
+          </div>
+        </template>
+      </div>
+
+      <div v-if="isSpeaking" class="absolute -inset-1.5 rounded-full border border-success/30 animate-ping opacity-75">
+      </div>
+
+      <div v-if="isHostSeat" class="absolute -top-1 -right-1 z-20">
+        <div
+          class="bg-primary text-white text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded-full shadow-sm border border-black/20 font-bold leading-none">
+          HOST
+        </div>
       </div>
     </div>
-    <div class="flex flex-col max-w-[85%]">
-      <div class="flex items-center gap-2 mb-1 flex-wrap">
-        <span class="text-xs text-base-content/60 font-medium truncate max-w-30">
-          {{ senderName }}
-        </span>
 
-        <span v-if="isAnchor"
-          class="badge badge-xs sm:badge-sm badge-primary border-none gap-1 font-bold shadow-sm shadow-primary/30">
-          <Icon name="mingcute:mic-fill" class="text-[10px]" />
-          {{ $t('detail.anchor') }}
-        </span>
-
-        <span v-else
-          class="badge badge-xs badge-ghost text-[10px] text-base-content/40 border-base-content/10 bg-base-200/50">
-          LV.1
-        </span>
-      </div>
-
-      <div class="relative rounded-2xl rounded-tl-none px-3 py-2 text-sm shadow-sm border transition-colors"
-        :class="bubbleClass">
-        <component :is="renderContent" :data="message" />
-      </div>
+    <div class="flex flex-col items-center w-16 sm:w-24 text-center space-y-0.5">
+      <span class="text-[10px] sm:text-sm font-medium text-white/90 truncate w-full drop-shadow-md">
+        {{ displayName }}
+      </span>
     </div>
   </div>
 </template>
-<script setup lang="tsx">
+<script setup lang="ts">
+import type { ISeat } from './SeatGrid.vue'
+
 const props = defineProps<{
-  message: any
-  ownerId: string
+  seat: ISeat
+  isSpeaking: boolean
 }>()
 
-const guestText = computed(() => $t('detail.guest'))
-const unknownText = computed(() => $t('detail.unknown_msg'))
+const { t } = useI18n()
 
-const isAnchor = computed(() => {
-  return (
-    props.message.sender?.userId &&
-    props.ownerId &&
-    props.message.sender.userId === props.ownerId
-  )
+const hasUser = computed(() => !!props.seat.userId)
+const isHostSeat = computed(() => props.seat.index === 0)
+const isMuted = computed(() => hasUser.value && !props.seat.userMicrophoneStatus)
+
+const displayName = computed(() => {
+  if (props.seat.userName) return props.seat.userName
+  if (props.seat.userId) return t('detail.guest')
+  if (props.seat.isLocked) return t('detail.locked')
+  return `${props.seat.index + 1}`
 })
 
-const avatar = computed(() => {
-  const url = props.message.sender?.avatarUrl
-  const seed = props.message.sender?.userId || 'default'
+const avatarUrl = computed(() => {
+  const url = props.seat.avatarUrl
+  const seed = props.seat.userId || 'default'
   if (url && url.startsWith('http')) return url
   return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed}`
 })
-
-const senderName = computed(() => {
-  return (
-    props.message.sender?.userName ||
-    props.message.sender?.userId ||
-    guestText.value
-  )
-})
-
-const bubbleClass = computed(() => {
-  return isAnchor.value
-    ? 'bg-primary/10 border-primary/20 text-base-content'
-    : 'bg-white dark:bg-base-200 border-base-content/5 text-base-content/90'
-})
-
-const renderContent = computed(() => {
-  const { message } = props
-
-  if (message.textContent !== undefined) {
-    return () => (
-      <span class="whitespace-pre-wrap break-all">
-        {message.textContent}
-      </span>
-    )
-  }
-
-  if (message.imageInfo) {
-    return () => (
-      <div class="max-w-50 rounded-lg overflow-hidden">
-        <img
-          src={message.imageInfo.url}
-          class="w-full h-auto"
-          loading="lazy"
-        />
-      </div>
-    )
-  }
-
-  return () => (
-    <span class="italic opacity-50 text-xs">
-      {unknownText.value}
-    </span>
-  )
-})
 </script>
-
-<style scoped>
-.animate-fade-in-up {
-  animation: fadeInUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-</style>
-<i18n lang="json">{
-  "zh-CN": {
-    "detail": {
-      "anchor": "主播",
-      "guest": "游客",
-      "unknown_msg": "未知消息"
-    }
-  },
-  "zh-TW": {
-    "detail": {
-      "anchor": "主播",
-      "guest": "訪客",
-      "unknown_msg": "未知訊息"
-    }
-  },
-  "en": {
-    "detail": {
-      "anchor": "Host",
-      "guest": "Guest",
-      "unknown_msg": "Unknown message"
-    }
-  }
-}</i18n>
