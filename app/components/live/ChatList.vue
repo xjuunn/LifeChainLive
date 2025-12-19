@@ -10,7 +10,7 @@
         <p class="leading-relaxed text-xs sm:text-sm">{{ t('detail.welcome') }}</p>
       </div>
       <TransitionGroup name="list" tag="div" class="space-y-4 pb-2">
-        <MessageItem v-for="msg in messageList" :key="msg.sequence" :message="msg" :owner-id="ownerId" />
+        <ChatItem v-for="msg in messageList" :key="msg.sequence" :message="msg" :owner-id="ownerId" />
       </TransitionGroup>
 
       <div ref="bottomRef" class="h-1 w-full"></div>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { useBarrageState } from 'tuikit-atomicx-vue3'
 
-const MessageItem = defineAsyncComponent(() => import('./ChatItem.vue'))
+const ChatItem = defineAsyncComponent(() => import('./ChatItem.vue'))
 
 defineProps<{
   ownerId: string
