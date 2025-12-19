@@ -75,6 +75,7 @@ const fetchRooms = async (reset = false) => {
       page: page.value,
       pageSize
     })
+    console.log(res);
 
     const newRooms = res.data?.rooms || []
     rooms.value = reset ? newRooms : [...rooms.value, ...newRooms]
