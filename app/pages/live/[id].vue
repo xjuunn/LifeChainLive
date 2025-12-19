@@ -1,7 +1,6 @@
 <template>
-  <div class="flex h-full w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
+  <div class="flex h-[100dvh] w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
-
       <ClientOnly>
         <LivePlayer :room-id="roomId" @loaded="loading = false" class="absolute inset-0 w-full h-full object-contain"
           :class="{ 'opacity-0 pointer-events-none': isVoiceRoom }" />
@@ -53,6 +52,7 @@
 
     <div
       class="relative z-30 flex flex-1 lg:flex-none lg:w-[400px] flex-col bg-base-100 shadow-2xl border-l border-base-content/5 overflow-hidden h-[55vh] lg:h-full">
+
       <div v-if="pending" class="flex flex-1 flex-col p-4 gap-4 animate-pulse">
         <div class="flex items-center gap-3 border-b border-base-content/5 pb-4">
           <div class="w-12 h-12 rounded-full bg-base-200"></div>
@@ -70,14 +70,14 @@
           <div class="flex items-center gap-3 overflow-hidden">
             <div class="avatar">
               <div
-                class="w-10 h-10 rounded-full shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300">
+                class="w-10 h-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100 shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300">
                 <img :src="getAvatarUrl(roomInfo.ownerAvatar, roomInfo.ownerId)"
                   class="object-cover w-full h-full rounded-full" alt="anchor" />
               </div>
             </div>
             <div class="flex flex-col truncate">
               <span class="font-bold text-base-content truncate text-sm sm:text-base">{{ roomInfo.ownerNickname
-              }}</span>
+                }}</span>
               <div class="flex items-center gap-1.5 text-xs text-base-content/60">
                 <div class="flex items-center gap-0.5 text-error">
                   <Icon name="mingcute:fire-fill" />
@@ -96,9 +96,9 @@
           </button>
         </div>
 
-        <div class="flex-1 overflow-hidden relative bg-base-50/50">
+        <div class="flex-1 min-h-0 flex flex-col relative bg-base-50/50 overflow-hidden">
           <ClientOnly>
-            <LiveChatList :owner-id="roomInfo.ownerId" />
+            <LiveChatList :owner-id="roomInfo.ownerId" class="flex-1 min-h-0" />
           </ClientOnly>
         </div>
 
@@ -141,6 +141,7 @@
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
 import { useBarrageState } from 'tuikit-atomicx-vue3'
+definePageMeta({ layout: 'empty' })
 
 const LivePlayer = defineAsyncComponent(() => import('~/components/live/Player.vue'))
 const LiveChatList = defineAsyncComponent(() => import('~/components/live/ChatList.vue'))
@@ -223,8 +224,19 @@ useHead({
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-</style>
 
+@keyframes music-bar {
+
+  0%,
+  100% {
+    height: 20%;
+  }
+
+  50% {
+    height: 100%;
+  }
+}
+</style>
 <i18n lang="json">{
   "zh-CN": {
     "detail": {
