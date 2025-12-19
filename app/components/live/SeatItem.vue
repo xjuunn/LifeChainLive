@@ -1,55 +1,67 @@
 <template>
-  <div class="relative flex flex-col items-center gap-2 group">
-    <div class="relative">
-      <div class="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full transition-all duration-300 relative z-10"
+  <div class="relative flex flex-col items-center gap-2 group w-full">
+    <div class="relative transition-all duration-300 transform group-hover:scale-105">
+      <div
+        class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full relative z-10 flex items-center justify-center overflow-hidden border-2 bg-base-300"
         :class="[
-          isSpeaking ? 'ring-2 ring-success shadow-[0_0_15px_rgba(var(--success-rgb),0.5)] scale-105' : 'ring-2 ring-white/10 group-hover:ring-white/30',
+          isSpeaking ? 'border-success shadow-[0_0_20px_rgba(var(--success-rgb),0.6)]' : 'border-white/10 group-hover:border-white/30',
           seat.isLocked ? 'bg-base-200/50' : 'bg-base-300'
         ]">
-        <template v-if="seat.userId">
-          <NuxtImg :src="avatarUrl" class="w-full h-full rounded-full object-cover" loading="lazy" />
-          <div class="absolute inset-0 rounded-full bg-black/20" v-if="isMuted"></div>
-          <div class="absolute -bottom-1 -right-1 bg-black/60 backdrop-blur-sm rounded-full p-1 border border-white/10"
-            v-if="isMuted">
-            <Icon name="mingcute:mic-off-fill" class="text-error text-xs" />
+        <template v-if="hasUser">
+          <NuxtImg :src="avatarUrl" class="w-full h-full object-cover" loading="lazy" :alt="seat.userName || 'user'" />
+          <div v-if="isMuted" class="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
+            <div class="bg-black/60 p-1 rounded-full border border-white/10">
+              <Icon name="mingcute:mic-off-fill" class="text-error text-xs sm:text-base" />
+            </div>
           </div>
         </template>
+
         <template v-else>
-          <div
-            class="w-full h-full flex items-center justify-center rounded-full bg-white/5 backdrop-blur-sm text-white/20">
-            <Icon v-if="seat.isLocked" name="mingcute:lock-fill" class="text-xl" />
-            <Icon v-else name="mingcute:sofa-line" class="text-xl" />
+          <div class="text-white/20 flex flex-col items-center justify-center gap-1">
+            <Icon v-if="seat.isLocked" name="mingcute:lock-fill" class="text-lg sm:text-2xl" />
+            <Icon v-else name="mingcute:sofa-line" class="text-lg sm:text-2xl" />
           </div>
         </template>
       </div>
 
-      <div v-if="isSpeaking" class="absolute -inset-1 rounded-full border border-success/30 animate-ping"></div>
+      <div v-if="isSpeaking" class="absolute -inset-1.5 rounded-full border border-success/30 animate-ping opacity-75">
+      </div>
+
+      <div v-if="isHostSeat" class="absolute -top-1 -right-1 z-20">
+        <div
+          class="bg-primary text-white text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded-full shadow-sm border border-black/20 font-bold leading-none">
+          主播
+        </div>
+      </div>
     </div>
 
-    <div class="flex flex-col items-center max-w-[80px]">
-      <span class="text-xs font-medium text-white/90 truncate w-full text-center shadow-black drop-shadow-md">
-        {{ seat.userName || (seat.userId ? t('detail.guest') : index + 1) }}
-      </span>
-      <span v-if="isHost"
-        class="mt-0.5 px-1.5 py-0.5 rounded-full bg-primary/80 text-[10px] leading-none font-bold text-white shadow-sm">
-        HOST
+    <div class="flex flex-col items-center w-16 sm:w-24 text-center space-y-0.5">
+      <span class="text-[10px] sm:text-sm font-medium text-white/90 truncate w-full drop-shadow-md">
+        {{ displayName }}
       </span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import type { ISeat } from './SeatGrid.vue'
+
 const props = defineProps<{
-  seat: any;
-  index: number;
-  isSpeaking: boolean;
-  hostId?: string;
+  seat: ISeat
+  isSpeaking: boolean
 }>()
 
 const { t } = useI18n()
 
-const isHost = computed(() => props.hostId && props.seat.userId === props.hostId)
+const hasUser = computed(() => !!props.seat.userId)
+const isHostSeat = computed(() => props.seat.index === 0)
+const isMuted = computed(() => hasUser.value && props.seat.userMicrophoneStatus === 0)
 
-const isMuted = computed(() => !props.seat.userMicrophoneStatus && props.seat.userId)
+const displayName = computed(() => {
+  if (props.seat.userName) return props.seat.userName
+  if (props.seat.userId) return t('detail.guest')
+  if (props.seat.isLocked) return t('detail.locked')
+  return `${props.seat.index + 1}`
+})
 
 const avatarUrl = computed(() => {
   const url = props.seat.avatarUrl

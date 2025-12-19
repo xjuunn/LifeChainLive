@@ -8,13 +8,12 @@
     </div>
     <div class="relative z-10 w-full max-w-5xl mx-auto">
       <div class="grid grid-cols-5 gap-x-2 gap-y-6 sm:gap-x-8 sm:gap-y-10 justify-items-center">
-        <SeatItem v-for="(seat, index) in displaySeatList" :key="seat.userId || `empty-${index}`" :seat="seat"
-          :is-speaking="checkIsSpeaking(seat.userId)" :index="index" />
+        <SeatItem v-for="seat in displaySeatList" :key="seat.index" :seat="seat"
+          :is-speaking="checkIsSpeaking(seat.userId)" />
       </div>
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { useLiveSeatState } from 'tuikit-atomicx-vue3'
 import type { LiveRoom } from '~/api/live'
@@ -38,14 +37,22 @@ const props = defineProps<{
 const { seatList, speakingUsers } = useLiveSeatState()
 
 const displaySeatList = computed<ISeat[]>(() => {
-  const currentList = seatList.value as unknown as ISeat[] || []
+  const currentList = (seatList.value || []) as any[]
 
   return Array.from({ length: 10 }).map((_, i) => {
-    const existingSeat = currentList.find(s => s.index === i)
+    const existingSeat = currentList.find(s => (s.index ?? s.seatIndex) === i)
 
     if (i === 0) {
       if (existingSeat && existingSeat.userId) {
-        return existingSeat
+        return {
+          index: 0,
+          userId: existingSeat.userId,
+          userName: existingSeat.userName,
+          avatarUrl: existingSeat.avatarUrl || existingSeat.userAvatar,
+          isLocked: existingSeat.isLocked,
+          userMicrophoneStatus: existingSeat.userMicrophoneStatus,
+          isAudioLocked: existingSeat.isAudioLocked
+        }
       }
       return {
         index: 0,
@@ -55,11 +62,19 @@ const displaySeatList = computed<ISeat[]>(() => {
         isLocked: false,
         userMicrophoneStatus: 1,
         isAudioLocked: false
-      } as ISeat
+      }
     }
 
-    if (existingSeat) {
-      return existingSeat
+    if (existingSeat && existingSeat.userId) {
+      return {
+        index: i,
+        userId: existingSeat.userId,
+        userName: existingSeat.userName,
+        avatarUrl: existingSeat.avatarUrl || existingSeat.userAvatar,
+        isLocked: existingSeat.isLocked,
+        userMicrophoneStatus: existingSeat.userMicrophoneStatus,
+        isAudioLocked: existingSeat.isAudioLocked
+      }
     }
 
     return {
@@ -68,7 +83,7 @@ const displaySeatList = computed<ISeat[]>(() => {
       userName: '',
       isLocked: false,
       userMicrophoneStatus: 0
-    } as ISeat
+    }
   })
 })
 

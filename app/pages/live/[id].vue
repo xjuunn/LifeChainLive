@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[100dvh] w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
+  <div class="flex h-full w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
 
       <ClientOnly>
