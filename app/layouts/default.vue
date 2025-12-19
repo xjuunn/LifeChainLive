@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="w-full h-full">
+    <AppHeader />
     <slot />
   </div>
 </template>

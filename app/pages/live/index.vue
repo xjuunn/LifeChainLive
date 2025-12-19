@@ -1,42 +1,66 @@
 <template>
-  <div class="min-h-screen bg-base-200/50">
-    <AppHeader />
+  <div class="h-full bg-base-200/30">
+    <main class="container mx-auto px-4 py-8 lg:px-8">
+      <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-1.5 rounded-full bg-primary"></div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-base-content">
+            {{ t('list.title') }}
+          </h1>
+        </div>
 
-    <main class="container mx-auto px-4 py-6">
-      <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-bold text-base-content">{{ t('list.title') }}</h1>
-
-        <div role="tablist" class="tabs tabs-boxed bg-base-100 shadow-sm">
-          <a role="tab" class="tab" :class="{ 'tab-active': !filterType }" @click="handleFilter(undefined)">
+        <div class="tabs tabs-boxed bg-base-100 p-1 shadow-sm border border-base-content/5">
+          <a class="tab h-9 rounded-lg px-6 text-sm font-medium transition-all"
+            :class="{ 'tab-active !bg-primary !text-primary-content shadow-md': !filterType }"
+            @click="handleFilter(undefined)">
             {{ t('list.all') }}
           </a>
-          <a role="tab" class="tab" :class="{ 'tab-active': filterType === 'liveroom' }"
+          <a class="tab h-9 rounded-lg px-6 text-sm font-medium transition-all"
+            :class="{ 'tab-active !bg-primary !text-primary-content shadow-md': filterType === 'liveroom' }"
             @click="handleFilter('liveroom')">
             {{ t('list.video') }}
           </a>
-          <a role="tab" class="tab" :class="{ 'tab-active': filterType === 'voiceroom' }"
+          <a class="tab h-9 rounded-lg px-6 text-sm font-medium transition-all"
+            :class="{ 'tab-active !bg-primary !text-primary-content shadow-md': filterType === 'voiceroom' }"
             @click="handleFilter('voiceroom')">
             {{ t('list.voice') }}
           </a>
         </div>
       </div>
 
-      <div ref="gridRef" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <LiveCard v-for="room in rooms" :key="room.roomId" :room="room" class="live-item" />
+      <div ref="gridRef" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <LiveCard v-for="room in rooms" :key="room.roomId" :room="room" class="live-item opacity-0 translate-y-8" />
+      </div>
+
+      <div v-if="loading && rooms.length === 0"
+        class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div v-for="i in 8" :key="i" class="flex flex-col gap-4 rounded-2xl bg-base-100 p-4 shadow-sm h-[300px]">
+          <div class="skeleton h-40 w-full rounded-xl"></div>
+          <div class="skeleton h-4 w-28"></div>
+          <div class="skeleton h-4 w-full"></div>
+          <div class="mt-auto flex items-center gap-2">
+            <div class="skeleton h-8 w-8 rounded-full"></div>
+            <div class="skeleton h-4 w-20"></div>
+          </div>
+        </div>
       </div>
 
       <div v-if="rooms.length === 0 && !loading"
-        class="flex flex-col items-center justify-center py-20 text-base-content/50">
-        <Icon name="mingcute:box-3-line" class="text-6xl mb-4" />
-        <p>{{ t('list.empty') }}</p>
+        class="flex flex-col items-center justify-center py-32 animate-fade-in">
+        <div class="relative mb-6">
+          <div class="absolute inset-0 animate-pulse rounded-full bg-primary/20 blur-xl"></div>
+          <Icon name="mingcute:tv-2-line" class="relative text-8xl text-base-content/20" />
+        </div>
+        <p class="text-lg font-medium text-base-content/60">{{ t('list.empty') }}</p>
       </div>
 
-      <div class="mt-12 flex justify-center">
-        <button v-if="hasMore" class="btn btn-wide" :class="{ 'btn-disabled': loading }" @click="loadMore">
+      <div class="mt-16 flex justify-center pb-12">
+        <button v-if="hasMore" class="btn btn-primary btn-wide shadow-lg shadow-primary/20"
+          :class="{ 'btn-disabled opacity-50': loading }" @click="loadMore">
           <span v-if="loading" class="loading loading-spinner"></span>
           {{ loading ? t('list.loading') : t('list.load_more') }}
         </button>
-        <div v-else-if="rooms.length > 0" class="divider text-xs text-base-content/30 w-full px-20">
+        <div v-else-if="rooms.length > 0" class="divider w-full max-w-md mx-auto text-xs text-base-content/30">
           {{ t('list.no_more') }}
         </div>
       </div>
@@ -49,7 +73,7 @@ import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
 import { gsap } from 'gsap'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'local' })
 const gridRef = ref<HTMLElement>()
 
 const filterType = ref<'liveroom' | 'voiceroom' | undefined>()
@@ -75,17 +99,17 @@ const fetchRooms = async (reset = false) => {
       page: page.value,
       pageSize
     })
-    console.log(res);
 
     const newRooms = res.data?.rooms || []
     rooms.value = reset ? newRooms : [...rooms.value, ...newRooms]
     hasMore.value = newRooms.length >= pageSize
 
     if (newRooms.length > 0) {
-      nextTick(() => animateItems())
+      await nextTick()
+      animateItems()
     }
   } catch (error) {
-    console.error(error)
+    console.error('Fetch rooms error:', error)
   } finally {
     loading.value = false
   }
@@ -102,28 +126,34 @@ const loadMore = () => {
   fetchRooms()
 }
 
-useGsap((ctx) => {
-  animateItems()
-}, gridRef)
-
 const animateItems = () => {
   if (!gridRef.value) return
+
+  const items = gridRef.value.querySelectorAll('.live-item:not(.is-animated)')
+  if (items.length === 0) return
+
   gsap.fromTo(
-    '.live-item:not(.is-animated)',
-    { opacity: 0, y: 30 },
+    items,
+    { opacity: 0, y: 50, scale: 0.95 },
     {
       opacity: 1,
       y: 0,
-      duration: 0.5,
+      scale: 1,
+      duration: 0.6,
       stagger: 0.05,
-      ease: 'power2.out',
-      onComplete: function () {
-        // @ts-ignore
-        this.targets().forEach(el => el.classList.add('is-animated'))
+      ease: 'power3.out',
+      onComplete: () => {
+        items.forEach(el => el.classList.add('is-animated'))
       }
     }
   )
 }
+
+useGsap((ctx) => {
+  if (rooms.value.length > 0) {
+    animateItems()
+  }
+}, gridRef)
 
 onMounted(() => {
   fetchRooms(true)
@@ -140,7 +170,7 @@ onMounted(() => {
       "empty": "暂无直播",
       "loading": "加载中...",
       "load_more": "加载更多",
-      "no_more": "没有更多了"
+      "no_more": "没有更多内容了"
     }
   },
   "zh-TW": {
@@ -152,7 +182,7 @@ onMounted(() => {
       "empty": "暫無直播",
       "loading": "加載中...",
       "load_more": "加載更多",
-      "no_more": "沒有更多了"
+      "no_more": "沒有更多內容了"
     }
   },
   "en": {
