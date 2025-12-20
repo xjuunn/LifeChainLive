@@ -1,7 +1,8 @@
 <template>
-  <div class="flex h-full w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
+  <div class="flex h-[100dvh] w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
+
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
-      <title>{{ roomInfo?.title }}</title>
+
       <ClientOnly>
         <LivePlayer :room-id="roomId" @loaded="loading = false" class="absolute inset-0 w-full h-full object-contain"
           :class="{ 'opacity-0 pointer-events-none': isVoiceRoom }" />
@@ -100,7 +101,7 @@
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 relative bg-base-50/50">
+        <div class="flex-1 min-h-0 overflow-scroll relative bg-base-50/50">
           <ClientOnly>
             <LiveChatList :owner-id="roomInfo.ownerId" />
           </ClientOnly>
@@ -128,7 +129,7 @@
         </div>
       </template>
 
-      <div v-else class="flex h-full flex-col items-center justify-center gap-6 text-base-content/60 p-8">
+      <div v-else-if="!pending" class="flex h-full flex-col items-center justify-center gap-6 text-base-content/60 p-8">
         <Icon name="mingcute:ghost-line" class="text-8xl opacity-80" />
         <div class="text-center space-y-2">
           <h3 class="text-xl font-bold">{{ t('detail.not_found') }}</h3>
@@ -146,7 +147,9 @@
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
 import { useBarrageState } from 'tuikit-atomicx-vue3'
+
 definePageMeta({ layout: 'empty' })
+
 const LivePlayer = defineAsyncComponent(() => import('~/components/live/Player.vue'))
 const LiveChatList = defineAsyncComponent(() => import('~/components/live/ChatList.vue'))
 const SeatGrid = defineAsyncComponent(() => import('~/components/live/SeatGrid.vue'))
@@ -168,7 +171,11 @@ const { sendTextMessage } = useBarrageState()
 const { data: roomInfo, pending, error } = await useAsyncData<LiveRoom>(
   `room-${roomId.value}`,
   () => LiveApi.info(roomId.value).then(res => res.data),
-  { watch: [roomId] }
+  {
+    watch: [roomId],
+    lazy: true,
+    server: false
+  }
 )
 
 const isVoiceRoom = computed(() => roomInfo.value?.roomType === 'voiceroom')
@@ -266,6 +273,7 @@ useHead({
   }
 }
 </style>
+
 <i18n lang="json">{
   "zh-CN": {
     "detail": {
