@@ -72,7 +72,7 @@
           <div class="flex items-center gap-3 overflow-hidden">
             <div class="avatar">
               <div
-                class="w-10 h-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100 shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300">
+                class="w-10 h-10 rounded-full shadow-sm cursor-pointer hover:scale-105 transition-transform bg-base-300">
                 <img :src="getAvatarUrl(roomInfo.ownerAvatar, roomInfo.ownerId)"
                   class="object-cover w-full h-full rounded-full" alt="anchor" />
               </div>

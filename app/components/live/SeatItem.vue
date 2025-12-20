@@ -1,16 +1,18 @@
 <template>
-  <div class="relative flex flex-col items-center gap-2 group w-full">
+  <div class="relative flex flex-col items-center gap-2 group w-full transition-all duration-300">
     <div class="relative transition-all duration-300 transform group-hover:scale-105">
+      <!-- 头像容器 -->
       <div
-        class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full relative z-10 flex items-center justify-center overflow-hidden border-2 bg-base-300"
-        :class="[
-          isSpeaking ? 'border-success shadow-[0_0_20px_rgba(var(--success-rgb),0.6)]' : 'border-white/10 group-hover:border-white/30',
-          seat.isLocked ? 'bg-base-200/50' : 'bg-base-300'
-        ]">
+        class="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full relative z-10 flex items-center justify-center overflow-hidden border-2 bg-base-300 transition-colors"
+        :class="borderClass">
         <template v-if="hasUser">
-          <NuxtImg :src="avatarUrl" class="w-full h-full object-cover" loading="lazy" :alt="seat.userName || 'user'" />
-          <div v-if="isMuted" class="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
-            <div class="bg-black/60 p-1 rounded-full border border-white/10">
+          <NuxtImg :src="avatarUrl" class="w-full h-full object-cover" loading="lazy"
+            :alt="seat.userInfo?.userName || 'user'" />
+
+          <!-- 闭麦状态遮罩 -->
+          <div v-if="isMuted"
+            class="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[1px] transition-all">
+            <div class="bg-black/60 p-1.5 rounded-full border border-white/20 shadow-md">
               <Icon name="mingcute:mic-off-fill" class="text-error text-xs sm:text-base" />
             </div>
           </div>
@@ -24,49 +26,63 @@
         </template>
       </div>
 
-      <div v-if="isSpeaking" class="absolute -inset-1.5 rounded-full border border-success/30 animate-ping opacity-75">
+      <!-- 说话波纹动画 -->
+      <div v-if="isSpeaking"
+        class="absolute -inset-1.5 rounded-full border-2 border-success/40 animate-ping opacity-75 pointer-events-none">
       </div>
+      <div v-if="isSpeaking"
+        class="absolute -inset-1.5 rounded-full border-2 border-success/20 animate-pulse pointer-events-none"></div>
 
-      <div v-if="isHostSeat" class="absolute -top-1 -right-1 z-20">
+      <!-- 房主标识 -->
+      <div v-if="isHostSeat" class="absolute -top-1.5 -right-1.5 z-20">
         <div
-          class="bg-primary text-white text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded-full shadow-sm border border-black/20 font-bold leading-none">
-          主播
+          class="bg-gradient-to-r from-primary to-secondary text-white text-[8px] sm:text-[10px] px-2 py-0.5 rounded-full shadow-lg border border-white/10 font-extrabold tracking-wider transform scale-90 sm:scale-100">
+          HOST
         </div>
       </div>
     </div>
 
+    <!-- 用户名/状态 -->
     <div class="flex flex-col items-center w-16 sm:w-24 text-center space-y-0.5">
-      <span class="text-[10px] sm:text-sm font-medium text-white/90 truncate w-full drop-shadow-md">
+      <span class="text-[10px] sm:text-sm font-medium text-white/90 truncate w-full drop-shadow-md px-1">
         {{ displayName }}
       </span>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import type { ISeat } from './SeatGrid.vue'
+import type { SeatInfo } from 'tuikit-atomicx-vue3';
+
 
 const props = defineProps<{
-  seat: ISeat
+  seat: SeatInfo
   isSpeaking: boolean
 }>()
 
 const { t } = useI18n()
 
-const hasUser = computed(() => !!props.seat.userId)
+const hasUser = computed(() => !!props.seat.userInfo?.userId && props.seat.userInfo.userId !== '')
 const isHostSeat = computed(() => props.seat.index === 0)
-const isMuted = computed(() => hasUser.value && props.seat.userMicrophoneStatus === 0)
+const isMuted = computed(() => hasUser.value && !props.seat.userInfo?.microphoneStatus)
+
+const borderClass = computed(() => {
+  if (props.isSpeaking) return 'border-success shadow-[0_0_20px_rgba(var(--success-rgb),0.6)]'
+  if (props.seat.isLocked) return 'border-base-content/10 bg-base-200/50'
+  return 'border-white/10 group-hover:border-white/30'
+})
 
 const displayName = computed(() => {
-  if (props.seat.userName) return props.seat.userName
-  if (props.seat.userId) return t('detail.guest')
+  if (props.seat.userInfo?.userName) return props.seat.userInfo?.userName
+  if (props.seat.userInfo?.userId) return t('detail.guest')
   if (props.seat.isLocked) return t('detail.locked')
   return `${props.seat.index + 1}`
 })
 
 const avatarUrl = computed(() => {
-  const url = props.seat.avatarUrl
-  const seed = props.seat.userId || 'default'
+  const url = props.seat.userInfo?.avatarUrl
   if (url && url.startsWith('http')) return url
+  const seed = props.seat.userInfo?.userId || `seat-${props.seat.index}`
   return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed}`
 })
 </script>

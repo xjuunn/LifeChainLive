@@ -6,27 +6,20 @@
         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse">
       </div>
     </div>
+
     <div class="relative z-10 w-full max-w-5xl mx-auto">
       <div class="grid grid-cols-5 gap-x-2 gap-y-6 sm:gap-x-8 sm:gap-y-10 justify-items-center">
-        <SeatItem v-for="seat in displaySeatList" :key="seat.index" :seat="seat"
-          :is-speaking="checkIsSpeaking(seat.userId)" />
+        <SeatItem v-for="seat in seatList" :key="seat.index" :seat="seat"
+          :is-speaking="checkIsSpeaking(seat.userInfo?.userId)" />
       </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { useLiveSeatState } from 'tuikit-atomicx-vue3'
+import { useLiveSeatState, type RegionInfo } from 'tuikit-atomicx-vue3'
 import type { LiveRoom } from '~/api/live'
 
-export interface ISeat {
-  index: number
-  userId: string
-  userName?: string
-  avatarUrl?: string
-  isLocked?: boolean
-  userMicrophoneStatus?: number
-  isAudioLocked?: boolean
-}
 
 const SeatItem = defineAsyncComponent(() => import('./SeatItem.vue'))
 
@@ -35,57 +28,6 @@ const props = defineProps<{
 }>()
 
 const { seatList, speakingUsers } = useLiveSeatState()
-
-const displaySeatList = computed<ISeat[]>(() => {
-  const currentList = (seatList.value || []) as any[]
-
-  return Array.from({ length: 10 }).map((_, i) => {
-    const existingSeat = currentList.find(s => (s.index ?? s.seatIndex) === i)
-
-    if (i === 0) {
-      if (existingSeat && existingSeat.userId) {
-        return {
-          index: 0,
-          userId: existingSeat.userId,
-          userName: existingSeat.userName,
-          avatarUrl: existingSeat.avatarUrl || existingSeat.userAvatar,
-          isLocked: existingSeat.isLocked,
-          userMicrophoneStatus: existingSeat.userMicrophoneStatus,
-          isAudioLocked: existingSeat.isAudioLocked
-        }
-      }
-      return {
-        index: 0,
-        userId: props.roomInfo.ownerId,
-        userName: props.roomInfo.ownerNickname,
-        avatarUrl: props.roomInfo.ownerAvatar,
-        isLocked: false,
-        userMicrophoneStatus: 1,
-        isAudioLocked: false
-      }
-    }
-
-    if (existingSeat && existingSeat.userId) {
-      return {
-        index: i,
-        userId: existingSeat.userId,
-        userName: existingSeat.userName,
-        avatarUrl: existingSeat.avatarUrl || existingSeat.userAvatar,
-        isLocked: existingSeat.isLocked,
-        userMicrophoneStatus: existingSeat.userMicrophoneStatus,
-        isAudioLocked: existingSeat.isAudioLocked
-      }
-    }
-
-    return {
-      index: i,
-      userId: '',
-      userName: '',
-      isLocked: false,
-      userMicrophoneStatus: 0
-    }
-  })
-})
 
 const checkIsSpeaking = (userId?: string) => {
   if (!userId || !speakingUsers.value) return false
