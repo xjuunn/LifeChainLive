@@ -100,7 +100,7 @@
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-scroll relative bg-base-50/50">
+        <div class="flex-1 min-h-0 relative bg-base-50/50">
           <ClientOnly>
             <LiveChatList :owner-id="roomInfo.ownerId" />
           </ClientOnly>
