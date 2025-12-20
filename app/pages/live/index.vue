@@ -1,5 +1,6 @@
 <template>
   <div class="h-full bg-base-200/30">
+    <title>{{ t('list.title') }}</title>
     <main class="container mx-auto px-4 py-8 lg:px-8">
       <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-3">

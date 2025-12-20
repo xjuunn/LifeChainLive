@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
-
+      <title>{{ roomInfo?.title }}</title>
       <ClientOnly>
         <LivePlayer :room-id="roomId" @loaded="loading = false" class="absolute inset-0 w-full h-full object-contain"
           :class="{ 'opacity-0 pointer-events-none': isVoiceRoom }" />
@@ -78,7 +78,7 @@
             </div>
             <div class="flex flex-col truncate">
               <span class="font-bold text-base-content truncate text-sm sm:text-base">{{ roomInfo.ownerNickname
-                }}</span>
+              }}</span>
               <div class="flex items-center gap-1.5 text-xs text-base-content/60">
                 <div class="flex items-center gap-0.5 text-error">
                   <Icon name="mingcute:fire-fill" />
