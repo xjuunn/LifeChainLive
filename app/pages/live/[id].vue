@@ -1,6 +1,5 @@
 <template>
-  <div class="flex h-[100dvh] w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
-
+  <div class="flex h-full w-full flex-col bg-black lg:flex-row overflow-hidden font-sans">
     <div class="relative w-full h-[45vh] lg:h-full lg:flex-1 bg-gray-950 group/player overflow-hidden">
 
       <ClientOnly>
@@ -90,25 +89,28 @@
               </div>
             </div>
           </div>
-          <button
-            class="btn btn-primary btn-sm rounded-full px-4 sm:px-5 font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all"
-            @click="handleFollow">
-            <Icon name="mingcute:add-line" />
-            <span class="hidden sm:inline">{{ t('detail.follow') }}</span>
-          </button>
+          <div class="join">
+            <button class="btn btn-sm btn-ghost join-item" @click="handleShare">
+              <icon name="mingcute:share-forward-fill"></icon>
+            </button>
+            <button class="btn btn-primary btn-sm join-item px-4 font-bold shadow-lg" @click="handleFollow">
+              <Icon name="mingcute:add-line" />
+              <span class="hidden sm:inline">{{ t('detail.follow') }}</span>
+            </button>
+          </div>
         </div>
 
-        <div class="flex-1 min-h-0 flex flex-col relative bg-base-50/50 overflow-hidden">
+        <div class="flex-1 min-h-0 overflow-scroll relative bg-base-50/50">
           <ClientOnly>
-            <LiveChatList :owner-id="roomInfo.ownerId" class="flex-1 min-h-0" />
+            <LiveChatList :owner-id="roomInfo.ownerId" />
           </ClientOnly>
         </div>
 
         <div class="flex-none border-t border-base-content/5 bg-base-100 p-3 lg:p-4 pb-safe z-10">
-          <div class="flex gap-2 items-center mb-4 relative">
+          <div class="flex gap-2 items-center relative">
             <div class="relative flex-1 group transition-all duration-300 focus-within:scale-[1.01]">
               <input ref="inputRef" v-model="textContent" type="text" :placeholder="t('detail.say_something')"
-                class="input input-bordered w-full rounded-md bg-base-200/50 pl-4 pr-12 focus:outline-none focus:bg-base-100 focus:border-primary transition-all text-sm h-10"
+                class="input input-bordered w-full rounded-full bg-base-200/50 pl-4 pr-12 focus:outline-none focus:bg-base-100 focus:border-primary transition-all text-sm h-10"
                 :disabled="isSending" @keydown.enter="handleSend" />
               <span v-if="textContent.length > 0"
                 class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-base-content/40 font-mono">
@@ -198,6 +200,27 @@ const handleFollow = async () => {
   if (confirmed) window.open('https://blog.lifetv.chat/apps', '_blank')
 }
 
+const handleShare = async () => {
+  if (!roomInfo.value) return
+
+  const url = window.location.href
+  const name = roomInfo.value.ownerNickname || roomInfo.value.title || t('detail.guest')
+
+  let shareText = ''
+  if (isVoiceRoom.value) {
+    shareText = `LifeChainLive · ${name} ${t('detail.share_voice_status')}\n${t('detail.share_voice_invite')}\n${url}`
+  } else {
+    shareText = `LifeChainLive · ${name} ${t('detail.share_live_status')}\n${t('detail.share_live_invite')}\n${url}`
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareText)
+    toast.success(t('detail.share_success'))
+  } catch (err) {
+    toast.error(t('detail.share_fail'))
+  }
+}
+
 const handleSend = async () => {
   const text = textContent.value.trim()
   if (!text) return
@@ -266,11 +289,17 @@ useHead({
       "cancel_btn": "再看看",
       "send_error": "发送失败，请重试",
       "mute_error": "您已被禁言",
+      "share_success": "分享链接已复制",
+      "share_fail": "复制失败，请手动复制",
       "notice": "系统公告",
       "welcome": "欢迎来到直播间，请遵守社区规范，文明发言。",
       "guest": "游客",
       "anchor": "主播",
-      "unknown_msg": "[未知消息类型]"
+      "unknown_msg": "[未知消息类型]",
+      "share_voice_status": "正在聊天",
+      "share_voice_invite": "快来一起参与实时语音互动吧",
+      "share_live_status": "正在直播",
+      "share_live_invite": "快来一起参与实时视频互动吧"
     }
   },
   "zh-TW": {
@@ -295,11 +324,17 @@ useHead({
       "cancel_btn": "再看看",
       "send_error": "發送失敗，請重試",
       "mute_error": "您已被禁言",
+      "share_success": "分享鏈接已復制",
+      "share_fail": "復制失敗，請手動復制",
       "notice": "系統公告",
       "welcome": "歡迎來到直播間，請遵守社區規範，文明發言。",
       "guest": "遊客",
       "anchor": "主播",
-      "unknown_msg": "[未知消息類型]"
+      "unknown_msg": "[未知消息類型]",
+      "share_voice_status": "正在聊天",
+      "share_voice_invite": "快來一起參與實時語音互動吧",
+      "share_live_status": "正在直播",
+      "share_live_invite": "快來一起參與實時視頻互動吧"
     }
   },
   "en": {
@@ -324,11 +359,17 @@ useHead({
       "cancel_btn": "Later",
       "send_error": "Failed to send",
       "mute_error": "You are muted",
+      "share_success": "Link copied to clipboard",
+      "share_fail": "Failed to copy link",
       "notice": "System Notice",
       "welcome": "Welcome to the live room. Please follow community guidelines.",
       "guest": "Guest",
       "anchor": "Host",
-      "unknown_msg": "[Unknown Message]"
+      "unknown_msg": "[Unknown Message]",
+      "share_voice_status": "is chatting",
+      "share_voice_invite": "Join the real-time voice interaction",
+      "share_live_status": "is live",
+      "share_live_invite": "Join the real-time video interaction"
     }
   }
 }</i18n>
