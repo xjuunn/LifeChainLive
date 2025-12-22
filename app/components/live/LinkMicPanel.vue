@@ -139,7 +139,7 @@ const handleApply = async () => {
     console.log('开始申请上麦, roomId:', props.roomId)
     const result = await applyForSeat({
       seatIndex: -1,  // -1表示自动分配座位
-      timeout: 60000  // 60秒超时
+      timeout: 60     // 60秒超时（单位：秒）
     })
     console.log('申请上麦结果:', result)
 
