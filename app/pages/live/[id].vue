@@ -228,7 +228,7 @@ import type { LiveRoom } from '~/api/live'
 import type { GiftMessage } from '~/api/gift'
 import { LinkStatus } from '~/api/linkmic'
 import * as LinkMicApi from '~/api/linkmic'
-import { useBarrageState, useCoGuestState, GuestEvent, useLiveSeatState } from 'tuikit-atomicx-vue3'
+import { useBarrageState, useCoGuestState, GuestEvent, useLiveSeatState, useDeviceState } from 'tuikit-atomicx-vue3'
 import type { SeatInfo } from 'tuikit-atomicx-vue3'
 
 definePageMeta({ layout: 'empty' })
@@ -270,6 +270,7 @@ const LUXURY_THRESHOLD = 500
 const { sendTextMessage } = useBarrageState()
 const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation, invitees } = useCoGuestState()
 const { unmuteMicrophone, muteMicrophone } = useLiveSeatState()
+const { openLocalMicrophone, closeLocalMicrophone } = useDeviceState()
 
 // 麦克风状态
 const isMuted = ref(true)
@@ -418,6 +419,9 @@ const handleSeatAction = async (action: string, seat: SeatInfo) => {
       try {
         console.log('切换麦克风, 当前isMuted:', isMuted.value)
         if (isMuted.value) {
+          // 先打开麦克风采集，再取消静音
+          console.log('调用 openLocalMicrophone...')
+          await openLocalMicrophone()
           console.log('调用 unmuteMicrophone...')
           await unmuteMicrophone()
           isMuted.value = false
@@ -426,6 +430,8 @@ const handleSeatAction = async (action: string, seat: SeatInfo) => {
         } else {
           console.log('调用 muteMicrophone...')
           await muteMicrophone()
+          console.log('调用 closeLocalMicrophone...')
+          await closeLocalMicrophone()
           isMuted.value = true
           console.log('麦克风已关闭')
           toast.success(t('detail.mic_off'))
@@ -461,6 +467,7 @@ const handleApplicationResponded = async (eventInfo: { isAccept: boolean; hostUs
     // 上麦成功后尝试开启麦克风
     try {
       console.log('尝试开启麦克风...')
+      await openLocalMicrophone()
       await unmuteMicrophone()
       isMuted.value = false
       console.log('麦克风已开启')
@@ -493,6 +500,7 @@ const handleAcceptInvitation = async () => {
     // 接受邀请后尝试开启麦克风
     try {
       console.log('尝试开启麦克风...')
+      await openLocalMicrophone()
       await unmuteMicrophone()
       isMuted.value = false
       console.log('麦克风已开启')
