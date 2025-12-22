@@ -268,10 +268,10 @@ const luxuryEffect = reactive({
 const LUXURY_THRESHOLD = 500
 
 const { sendTextMessage } = useBarrageState()
-const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation } = useCoGuestState()
+const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation, invitees } = useCoGuestState()
 
 // 邀请上麦相关状态
-const pendingInvitation = ref<{ hostUser: any } | null>(null)
+const pendingInvitation = ref<{ hostUser: any; requestUserId?: string } | null>(null)
 const showInvitationDialog = ref(false)
 
 const { data: roomInfo, pending, error } = await useAsyncData<LiveRoom>(
@@ -416,7 +416,8 @@ if (error.value) console.error('Room Fetch Error:', error.value)
 
 // 监听主播邀请上麦事件
 const handleInvitationReceived = (eventInfo: { hostUser: any }) => {
-  console.log('收到上麦邀请:', eventInfo.hostUser)
+  console.log('收到上麦邀请, eventInfo:', JSON.stringify(eventInfo), 'invitees:', invitees.value)
+  console.log('房主ID:', roomInfo.value?.ownerId)
   pendingInvitation.value = eventInfo
   showInvitationDialog.value = true
 }
@@ -446,10 +447,14 @@ const handleKickedOffSeat = () => {
 const handleAcceptInvitation = async () => {
   if (!pendingInvitation.value) return
   try {
-    await acceptInvitation({ inviterId: pendingInvitation.value.hostUser.userId })
+    // SDK内部用fromUser.userId（主播ID）存储请求，所以需要使用房主ID
+    const inviterId = roomInfo.value?.ownerId || pendingInvitation.value.hostUser.userId
+    console.log('接受邀请, inviterId:', inviterId, 'ownerId:', roomInfo.value?.ownerId)
+    await acceptInvitation({ inviterId })
     linkStatus.value = LinkStatus.LINKING
     toast.success(t('detail.invitation_accepted'))
   } catch (e) {
+    console.error('接受邀请失败:', e)
     toast.error(t('detail.accept_failed'))
   } finally {
     showInvitationDialog.value = false
@@ -461,7 +466,9 @@ const handleAcceptInvitation = async () => {
 const handleRejectInvitation = async () => {
   if (!pendingInvitation.value) return
   try {
-    await rejectInvitation({ inviterId: pendingInvitation.value.hostUser.userId })
+    const inviterId = roomInfo.value?.ownerId || pendingInvitation.value.hostUser.userId
+    console.log('拒绝邀请, inviterId:', inviterId)
+    await rejectInvitation({ inviterId })
   } catch (e) {
     console.error('拒绝邀请失败:', e)
   } finally {
