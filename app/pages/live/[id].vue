@@ -228,7 +228,7 @@ import type { LiveRoom } from '~/api/live'
 import type { GiftMessage } from '~/api/gift'
 import { LinkStatus } from '~/api/linkmic'
 import * as LinkMicApi from '~/api/linkmic'
-import { useBarrageState, useCoGuestState, GuestEvent } from 'tuikit-atomicx-vue3'
+import { useBarrageState, useCoGuestState, GuestEvent, useLiveSeatState } from 'tuikit-atomicx-vue3'
 import type { SeatInfo } from 'tuikit-atomicx-vue3'
 
 definePageMeta({ layout: 'empty' })
@@ -269,6 +269,7 @@ const LUXURY_THRESHOLD = 500
 
 const { sendTextMessage } = useBarrageState()
 const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation, invitees } = useCoGuestState()
+const { unmuteMicrophone } = useLiveSeatState()
 
 // 邀请上麦相关状态
 const pendingInvitation = ref<{ hostUser: any; requestUserId?: string } | null>(null)
@@ -428,10 +429,17 @@ const handleInvitationCancelled = () => {
   toast.info(t('detail.invitation_cancelled'))
 }
 
-const handleApplicationResponded = (eventInfo: { isAccept: boolean; hostUser: any }) => {
+const handleApplicationResponded = async (eventInfo: { isAccept: boolean; hostUser: any }) => {
   if (eventInfo.isAccept) {
     linkStatus.value = LinkStatus.LINKING
     toast.success(t('detail.apply_accepted'))
+    // 上麦成功后开启麦克风
+    try {
+      await unmuteMicrophone()
+      console.log('麦克风已开启')
+    } catch (e) {
+      console.error('开启麦克风失败:', e)
+    }
   } else {
     linkStatus.value = LinkStatus.NONE
     toast.error(t('detail.apply_rejected'))
@@ -453,6 +461,13 @@ const handleAcceptInvitation = async () => {
     await acceptInvitation({ inviterId })
     linkStatus.value = LinkStatus.LINKING
     toast.success(t('detail.invitation_accepted'))
+    // 接受邀请后开启麦克风
+    try {
+      await unmuteMicrophone()
+      console.log('麦克风已开启')
+    } catch (e) {
+      console.error('开启麦克风失败:', e)
+    }
   } catch (e) {
     console.error('接受邀请失败:', e)
     toast.error(t('detail.accept_failed'))
