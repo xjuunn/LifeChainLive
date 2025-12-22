@@ -416,13 +416,18 @@ const handleSeatAction = async (action: string, seat: SeatInfo) => {
       break
     case 'toggleMic':
       try {
+        console.log('切换麦克风, 当前isMuted:', isMuted.value)
         if (isMuted.value) {
+          console.log('调用 unmuteMicrophone...')
           await unmuteMicrophone()
           isMuted.value = false
+          console.log('麦克风已开启')
           toast.success(t('detail.mic_on'))
         } else {
+          console.log('调用 muteMicrophone...')
           await muteMicrophone()
           isMuted.value = true
+          console.log('麦克风已关闭')
           toast.success(t('detail.mic_off'))
         }
       } catch (e) {
@@ -453,13 +458,16 @@ const handleApplicationResponded = async (eventInfo: { isAccept: boolean; hostUs
   if (eventInfo.isAccept) {
     linkStatus.value = LinkStatus.LINKING
     toast.success(t('detail.apply_accepted'))
-    // 上麦成功后开启麦克风
+    // 上麦成功后尝试开启麦克风
     try {
+      console.log('尝试开启麦克风...')
       await unmuteMicrophone()
       isMuted.value = false
       console.log('麦克风已开启')
+      toast.success(t('detail.mic_on'))
     } catch (e) {
       console.error('开启麦克风失败:', e)
+      isMuted.value = true  // 开麦失败保持静音状态
     }
   } else {
     linkStatus.value = LinkStatus.NONE
@@ -482,13 +490,16 @@ const handleAcceptInvitation = async () => {
     await acceptInvitation({ inviterId })
     linkStatus.value = LinkStatus.LINKING
     toast.success(t('detail.invitation_accepted'))
-    // 接受邀请后开启麦克风
+    // 接受邀请后尝试开启麦克风
     try {
+      console.log('尝试开启麦克风...')
       await unmuteMicrophone()
       isMuted.value = false
       console.log('麦克风已开启')
+      toast.success(t('detail.mic_on'))
     } catch (e) {
       console.error('开启麦克风失败:', e)
+      isMuted.value = true  // 开麦失败保持静音状态
     }
   } catch (e) {
     console.error('接受邀请失败:', e)
