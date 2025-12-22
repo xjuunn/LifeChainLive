@@ -50,6 +50,10 @@
           <Icon name="mingcute:left-line" class="text-xl" />
         </button>
       </div>
+
+      <ClientOnly>
+        <GiftBullet ref="giftBulletRef" />
+      </ClientOnly>
     </div>
 
     <div
@@ -109,6 +113,12 @@
 
         <div class="flex-none border-t border-base-content/5 bg-base-100 p-3 lg:p-4 pb-safe z-10">
           <div class="flex gap-2 items-center relative">
+            <button
+              class="btn btn-circle btn-ghost h-10 w-10 min-h-0 text-warning hover:bg-warning/10"
+              @click="showGiftPanel = true">
+              <Icon name="mingcute:gift-fill" class="text-xl" />
+            </button>
+
             <div class="relative flex-1 group transition-all duration-300 focus-within:scale-[1.01]">
               <input ref="inputRef" v-model="textContent" type="text" :placeholder="t('detail.say_something')"
                 class="input input-bordered w-full rounded-full bg-base-200/50 pl-4 pr-12 focus:outline-none focus:bg-base-100 focus:border-primary transition-all text-sm h-10"
@@ -140,12 +150,34 @@
         </button>
       </div>
     </div>
+
+    <ClientOnly>
+      <GiftPanel
+        v-if="roomInfo"
+        :visible="showGiftPanel"
+        :room-id="roomId"
+        :owner-id="roomInfo.ownerId"
+        :owner-name="roomInfo.ownerNickname"
+        @close="showGiftPanel = false"
+        @send="handleGiftSend"
+      />
+
+      <GiftLuxury
+        :show="luxuryEffect.show"
+        :gift-icon="luxuryEffect.giftIcon"
+        :gift-name="luxuryEffect.giftName"
+        :sender-name="luxuryEffect.senderName"
+        :gift-count="luxuryEffect.giftCount"
+        @complete="luxuryEffect.show = false"
+      />
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
+import type { GiftMessage } from '~/api/gift'
 import { useBarrageState } from 'tuikit-atomicx-vue3'
 
 definePageMeta({ layout: 'empty' })
@@ -153,6 +185,9 @@ definePageMeta({ layout: 'empty' })
 const LivePlayer = defineAsyncComponent(() => import('~/components/live/Player.vue'))
 const LiveChatList = defineAsyncComponent(() => import('~/components/live/ChatList.vue'))
 const SeatGrid = defineAsyncComponent(() => import('~/components/live/SeatGrid.vue'))
+const GiftPanel = defineAsyncComponent(() => import('~/components/live/GiftPanel.vue'))
+const GiftBullet = defineAsyncComponent(() => import('~/components/live/GiftBullet.vue'))
+const GiftLuxury = defineAsyncComponent(() => import('~/components/live/GiftLuxury.vue'))
 
 const route = useRoute()
 const router = useRouter()
@@ -165,6 +200,18 @@ const loading = ref(true)
 const textContent = ref('')
 const isSending = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
+const showGiftPanel = ref(false)
+const giftBulletRef = ref<InstanceType<typeof GiftBullet> | null>(null)
+
+const luxuryEffect = reactive({
+  show: false,
+  giftIcon: '',
+  giftName: '',
+  senderName: '',
+  giftCount: 0
+})
+
+const LUXURY_THRESHOLD = 500
 
 const { sendTextMessage } = useBarrageState()
 
@@ -246,6 +293,18 @@ const handleSend = async () => {
     isSending.value = false
     await nextTick()
     inputRef.value?.focus()
+  }
+}
+
+const handleGiftSend = (message: GiftMessage) => {
+  giftBulletRef.value?.addBullet(message)
+
+  if (message.gift.price * message.giftCount >= LUXURY_THRESHOLD) {
+    luxuryEffect.show = true
+    luxuryEffect.giftIcon = message.gift.iconUrl
+    luxuryEffect.giftName = message.gift.name
+    luxuryEffect.senderName = message.sender.userName
+    luxuryEffect.giftCount = message.giftCount
   }
 }
 
