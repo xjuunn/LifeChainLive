@@ -136,16 +136,18 @@ const handleApply = async () => {
 
   try {
     // 使用SDK直接申请上麦
-    await applyForSeat({
+    console.log('开始申请上麦, roomId:', props.roomId)
+    const result = await applyForSeat({
       seatIndex: -1,  // -1表示自动分配座位
       timeout: 60000  // 60秒超时
     })
+    console.log('申请上麦结果:', result)
 
     emit('statusChange', LinkStatus.APPLYING)
     toast.success(t('linkmic.apply_success'))
 
-  } catch (e) {
-    console.error('申请上麦失败:', e)
+  } catch (e: any) {
+    console.error('申请上麦失败:', e, 'code:', e?.code, 'message:', e?.message)
     toast.error(t('linkmic.apply_failed'))
   } finally {
     applying.value = false
