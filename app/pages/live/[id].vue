@@ -187,6 +187,37 @@
         @close="showLinkMicPanel = false"
         @status-change="handleLinkStatusChange"
       />
+
+      <!-- 邀请上麦弹窗 -->
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showInvitationDialog && pendingInvitation" class="fixed inset-0 z-[200] flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="handleRejectInvitation"></div>
+            <div class="relative bg-base-100 rounded-2xl shadow-2xl p-6 mx-4 max-w-sm w-full animate-bounce-in">
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Icon name="mingcute:mic-fill" class="text-3xl text-primary" />
+                </div>
+                <h3 class="text-lg font-bold text-base-content mb-2">{{ t('detail.invitation_title') }}</h3>
+                <p class="text-sm text-base-content/60 mb-1">
+                  <span class="font-medium text-primary">{{ pendingInvitation.hostUser?.userName || t('detail.anchor') }}</span>
+                  {{ t('detail.invitation_desc') }}
+                </p>
+                <p class="text-xs text-base-content/40 mb-6">{{ t('detail.invitation_tip') }}</p>
+              </div>
+              <div class="flex gap-3">
+                <button class="btn btn-outline flex-1" @click="handleRejectInvitation">
+                  {{ t('detail.reject') }}
+                </button>
+                <button class="btn btn-primary flex-1" @click="handleAcceptInvitation">
+                  <Icon name="mingcute:check-fill" />
+                  {{ t('detail.accept') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
     </ClientOnly>
   </div>
 </template>
@@ -197,7 +228,7 @@ import type { LiveRoom } from '~/api/live'
 import type { GiftMessage } from '~/api/gift'
 import { LinkStatus } from '~/api/linkmic'
 import * as LinkMicApi from '~/api/linkmic'
-import { useBarrageState } from 'tuikit-atomicx-vue3'
+import { useBarrageState, useCoGuestState, GuestEvent } from 'tuikit-atomicx-vue3'
 import type { SeatInfo } from 'tuikit-atomicx-vue3'
 
 definePageMeta({ layout: 'empty' })
@@ -237,6 +268,11 @@ const luxuryEffect = reactive({
 const LUXURY_THRESHOLD = 500
 
 const { sendTextMessage } = useBarrageState()
+const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation } = useCoGuestState()
+
+// 邀请上麦相关状态
+const pendingInvitation = ref<{ hostUser: any } | null>(null)
+const showInvitationDialog = ref(false)
 
 const { data: roomInfo, pending, error } = await useAsyncData<LiveRoom>(
   `room-${roomId.value}`,
@@ -378,6 +414,78 @@ const handleSeatAction = async (action: string, seat: SeatInfo) => {
 
 if (error.value) console.error('Room Fetch Error:', error.value)
 
+// 监听主播邀请上麦事件
+const handleInvitationReceived = (eventInfo: { hostUser: any }) => {
+  console.log('收到上麦邀请:', eventInfo.hostUser)
+  pendingInvitation.value = eventInfo
+  showInvitationDialog.value = true
+}
+
+const handleInvitationCancelled = () => {
+  pendingInvitation.value = null
+  showInvitationDialog.value = false
+  toast.info(t('detail.invitation_cancelled'))
+}
+
+const handleApplicationResponded = (eventInfo: { isAccept: boolean; hostUser: any }) => {
+  if (eventInfo.isAccept) {
+    linkStatus.value = LinkStatus.LINKING
+    toast.success(t('detail.apply_accepted'))
+  } else {
+    linkStatus.value = LinkStatus.NONE
+    toast.error(t('detail.apply_rejected'))
+  }
+}
+
+const handleKickedOffSeat = () => {
+  linkStatus.value = LinkStatus.NONE
+  toast.info(t('detail.kicked_off'))
+}
+
+// 接受邀请
+const handleAcceptInvitation = async () => {
+  if (!pendingInvitation.value) return
+  try {
+    await acceptInvitation({ inviterId: pendingInvitation.value.hostUser.userId })
+    linkStatus.value = LinkStatus.LINKING
+    toast.success(t('detail.invitation_accepted'))
+  } catch (e) {
+    toast.error(t('detail.accept_failed'))
+  } finally {
+    showInvitationDialog.value = false
+    pendingInvitation.value = null
+  }
+}
+
+// 拒绝邀请
+const handleRejectInvitation = async () => {
+  if (!pendingInvitation.value) return
+  try {
+    await rejectInvitation({ inviterId: pendingInvitation.value.hostUser.userId })
+  } catch (e) {
+    console.error('拒绝邀请失败:', e)
+  } finally {
+    showInvitationDialog.value = false
+    pendingInvitation.value = null
+  }
+}
+
+onMounted(() => {
+  // 订阅连麦事件
+  subscribeEvent(GuestEvent.onHostInvitationReceived, handleInvitationReceived)
+  subscribeEvent(GuestEvent.onHostInvitationCancelled, handleInvitationCancelled)
+  subscribeEvent(GuestEvent.onGuestApplicationResponded, handleApplicationResponded)
+  subscribeEvent(GuestEvent.onKickedOffSeat, handleKickedOffSeat)
+})
+
+onUnmounted(() => {
+  // 取消订阅
+  unsubscribeEvent(GuestEvent.onHostInvitationReceived, handleInvitationReceived)
+  unsubscribeEvent(GuestEvent.onHostInvitationCancelled, handleInvitationCancelled)
+  unsubscribeEvent(GuestEvent.onGuestApplicationResponded, handleApplicationResponded)
+  unsubscribeEvent(GuestEvent.onKickedOffSeat, handleKickedOffSeat)
+})
+
 useHead({
   title: computed(() => roomInfo.value?.title || t('detail.live_room')),
 })
@@ -438,7 +546,18 @@ useHead({
       "cancel_success": "已取消申请",
       "cancel_failed": "取消失败",
       "leave_success": "已下麦",
-      "leave_failed": "下麦失败"
+      "leave_failed": "下麦失败",
+      "invitation_title": "上麦邀请",
+      "invitation_desc": "邀请您上麦互动",
+      "invitation_tip": "上麦后您可以与房间内的人语音交流",
+      "invitation_cancelled": "主播取消了邀请",
+      "invitation_accepted": "已接受邀请，正在上麦",
+      "accept_failed": "接受邀请失败",
+      "apply_accepted": "申请已通过",
+      "apply_rejected": "申请被拒绝",
+      "kicked_off": "您已被主播下麦",
+      "reject": "拒绝",
+      "accept": "接受"
     }
   },
   "zh-TW": {
@@ -477,7 +596,18 @@ useHead({
       "cancel_success": "已取消申請",
       "cancel_failed": "取消失敗",
       "leave_success": "已下麥",
-      "leave_failed": "下麥失敗"
+      "leave_failed": "下麥失敗",
+      "invitation_title": "上麥邀請",
+      "invitation_desc": "邀請您上麥互動",
+      "invitation_tip": "上麥後您可以與房間內的人語音交流",
+      "invitation_cancelled": "主播取消了邀請",
+      "invitation_accepted": "已接受邀請，正在上麥",
+      "accept_failed": "接受邀請失敗",
+      "apply_accepted": "申請已通過",
+      "apply_rejected": "申請被拒絕",
+      "kicked_off": "您已被主播下麥",
+      "reject": "拒絕",
+      "accept": "接受"
     }
   },
   "en": {
@@ -516,7 +646,18 @@ useHead({
       "cancel_success": "Request cancelled",
       "cancel_failed": "Failed to cancel",
       "leave_success": "Left the mic",
-      "leave_failed": "Failed to leave mic"
+      "leave_failed": "Failed to leave mic",
+      "invitation_title": "Mic Invitation",
+      "invitation_desc": "invites you to speak",
+      "invitation_tip": "After joining, you can voice chat with others",
+      "invitation_cancelled": "Host cancelled the invitation",
+      "invitation_accepted": "Invitation accepted, joining mic",
+      "accept_failed": "Failed to accept invitation",
+      "apply_accepted": "Request approved",
+      "apply_rejected": "Request rejected",
+      "kicked_off": "You were removed from mic",
+      "reject": "Reject",
+      "accept": "Accept"
     }
   }
 }</i18n>
