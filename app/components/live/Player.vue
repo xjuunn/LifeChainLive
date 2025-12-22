@@ -31,7 +31,13 @@ let isJoined = false
 const initLive = async () => {
   initError.value = ''
   try {
-    const guestId = `guest_${Math.floor(Math.random() * 10000000)}`
+    // 使用固定的用户ID，确保SDK和应用使用同一个ID
+    let guestId = localStorage.getItem('userId')
+    if (!guestId) {
+      guestId = `guest_${Math.floor(Math.random() * 10000000)}`
+      localStorage.setItem('userId', guestId)
+    }
+    
     const res = await LiveApi.join(guestId, props.roomId)
     const auth = res.data || res
 
@@ -39,6 +45,8 @@ const initLive = async () => {
       throw new Error(t('player.auth_failed'))
     }
 
+    console.log('SDK登录, userId:', auth.userId, 'roomId:', auth.roomId)
+    
     await login({
       sdkAppId: Number(auth.sdkAppId),
       userId: String(auth.userId),
