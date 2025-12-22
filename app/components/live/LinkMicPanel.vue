@@ -95,8 +95,8 @@
 </template>
 
 <script setup lang="ts">
-import * as LinkMicApi from '~/api/linkmic'
 import { LinkStatus } from '~/api/linkmic'
+import { useCoGuestState } from 'tuikit-atomicx-vue3'
 
 const props = defineProps<{
   visible: boolean
@@ -112,13 +112,11 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const toast = useToast()
 
+const { applyForSeat, cancelApplication, disConnect } = useCoGuestState()
+
 const applying = ref(false)
 const cancelling = ref(false)
 const leaving = ref(false)
-
-const APPLY_TIMEOUT = 60000
-
-let timeoutTimer: ReturnType<typeof setTimeout> | null = null
 
 const handleApply = async () => {
   applying.value = true
@@ -137,30 +135,17 @@ const handleApply = async () => {
   }
 
   try {
-    const userId = localStorage.getItem('userId') || 'guest_' + Date.now()
-    const userName = localStorage.getItem('userName') || t('linkmic.guest')
-    const userAvatar = localStorage.getItem('userAvatar') || ''
-
-    await LinkMicApi.applyToTakeSeat({
-      roomId: props.roomId,
-      userId,
-      userName,
-      avatarUrl: userAvatar,
-      seatIndex: -1,
-      timeout: 60
+    // 使用SDK直接申请上麦
+    await applyForSeat({
+      seatIndex: -1,  // -1表示自动分配座位
+      timeout: 60000  // 60秒超时
     })
 
     emit('statusChange', LinkStatus.APPLYING)
     toast.success(t('linkmic.apply_success'))
 
-    timeoutTimer = setTimeout(() => {
-      if (props.linkStatus === LinkStatus.APPLYING) {
-        emit('statusChange', LinkStatus.NONE)
-        toast.error(t('linkmic.apply_timeout'))
-      }
-    }, APPLY_TIMEOUT)
-
   } catch (e) {
+    console.error('申请上麦失败:', e)
     toast.error(t('linkmic.apply_failed'))
   } finally {
     applying.value = false
@@ -170,15 +155,12 @@ const handleApply = async () => {
 const handleCancel = async () => {
   cancelling.value = true
   try {
-    const userId = localStorage.getItem('userId') || ''
-    await LinkMicApi.cancelApplication(props.roomId, userId)
+    // 使用SDK取消申请
+    await cancelApplication()
     emit('statusChange', LinkStatus.NONE)
-    if (timeoutTimer) {
-      clearTimeout(timeoutTimer)
-      timeoutTimer = null
-    }
     toast.success(t('linkmic.cancel_success'))
   } catch (e) {
+    console.error('取消申请失败:', e)
     toast.error(t('linkmic.cancel_failed'))
   } finally {
     cancelling.value = false
@@ -188,22 +170,17 @@ const handleCancel = async () => {
 const handleLeave = async () => {
   leaving.value = true
   try {
-    const userId = localStorage.getItem('userId') || ''
-    await LinkMicApi.leaveSeat(props.roomId, userId)
+    // 使用SDK下麦
+    await disConnect()
     emit('statusChange', LinkStatus.NONE)
     toast.success(t('linkmic.leave_success'))
   } catch (e) {
+    console.error('下麦失败:', e)
     toast.error(t('linkmic.leave_failed'))
   } finally {
     leaving.value = false
   }
 }
-
-onUnmounted(() => {
-  if (timeoutTimer) {
-    clearTimeout(timeoutTimer)
-  }
-})
 </script>
 
 <style scoped>
