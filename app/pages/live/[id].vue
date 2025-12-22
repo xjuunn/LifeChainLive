@@ -28,7 +28,7 @@
             </div>
 
             <div class="relative z-20 flex-1 min-h-0">
-              <SeatGrid :room-info="roomInfo" />
+              <SeatGrid :room-info="roomInfo" :link-status="linkStatus" @seat-action="handleSeatAction" />
             </div>
           </div>
         </template>
@@ -114,6 +114,14 @@
         <div class="flex-none border-t border-base-content/5 bg-base-100 p-3 lg:p-4 pb-safe z-10">
           <div class="flex gap-2 items-center relative">
             <button
+              v-if="isVoiceRoom"
+              class="btn btn-circle btn-ghost h-10 w-10 min-h-0 hover:bg-primary/10"
+              :class="linkStatusButtonClass"
+              @click="showLinkMicPanel = true">
+              <Icon name="mingcute:mic-fill" class="text-xl" />
+            </button>
+
+            <button
               class="btn btn-circle btn-ghost h-10 w-10 min-h-0 text-warning hover:bg-warning/10"
               @click="showGiftPanel = true">
               <Icon name="mingcute:gift-fill" class="text-xl" />
@@ -170,6 +178,15 @@
         :gift-count="luxuryEffect.giftCount"
         @complete="luxuryEffect.show = false"
       />
+
+      <LinkMicPanel
+        v-if="roomInfo && isVoiceRoom"
+        :visible="showLinkMicPanel"
+        :room-id="roomId"
+        :link-status="linkStatus"
+        @close="showLinkMicPanel = false"
+        @status-change="handleLinkStatusChange"
+      />
     </ClientOnly>
   </div>
 </template>
@@ -178,7 +195,10 @@
 import * as LiveApi from '~/api/live'
 import type { LiveRoom } from '~/api/live'
 import type { GiftMessage } from '~/api/gift'
+import { LinkStatus } from '~/api/linkmic'
+import * as LinkMicApi from '~/api/linkmic'
 import { useBarrageState } from 'tuikit-atomicx-vue3'
+import type { SeatInfo } from 'tuikit-atomicx-vue3'
 
 definePageMeta({ layout: 'empty' })
 
@@ -188,6 +208,7 @@ const SeatGrid = defineAsyncComponent(() => import('~/components/live/SeatGrid.v
 const GiftPanel = defineAsyncComponent(() => import('~/components/live/GiftPanel.vue'))
 const GiftBullet = defineAsyncComponent(() => import('~/components/live/GiftBullet.vue'))
 const GiftLuxury = defineAsyncComponent(() => import('~/components/live/GiftLuxury.vue'))
+const LinkMicPanel = defineAsyncComponent(() => import('~/components/live/LinkMicPanel.vue'))
 
 const route = useRoute()
 const router = useRouter()
@@ -201,7 +222,9 @@ const textContent = ref('')
 const isSending = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 const showGiftPanel = ref(false)
+const showLinkMicPanel = ref(false)
 const giftBulletRef = ref<InstanceType<typeof GiftBullet> | null>(null)
+const linkStatus = ref<LinkStatus>(LinkStatus.NONE)
 
 const luxuryEffect = reactive({
   show: false,
@@ -308,6 +331,51 @@ const handleGiftSend = (message: GiftMessage) => {
   }
 }
 
+const linkStatusButtonClass = computed(() => {
+  switch (linkStatus.value) {
+    case LinkStatus.APPLYING:
+      return 'text-warning animate-pulse'
+    case LinkStatus.LINKING:
+      return 'text-success'
+    default:
+      return 'text-primary'
+  }
+})
+
+const handleLinkStatusChange = (status: LinkStatus) => {
+  linkStatus.value = status
+}
+
+const handleSeatAction = async (action: string, seat: SeatInfo) => {
+  const userId = localStorage.getItem('userId') || 'guest_' + Date.now()
+  const userName = localStorage.getItem('userName') || t('detail.guest')
+  const userAvatar = localStorage.getItem('userAvatar') || ''
+
+  switch (action) {
+    case 'apply':
+      showLinkMicPanel.value = true
+      break
+    case 'cancel':
+      try {
+        await LinkMicApi.cancelApplication(roomId.value, userId)
+        linkStatus.value = LinkStatus.NONE
+        toast.success(t('detail.cancel_success'))
+      } catch (e) {
+        toast.error(t('detail.cancel_failed'))
+      }
+      break
+    case 'leave':
+      try {
+        await LinkMicApi.leaveSeat(roomId.value, userId)
+        linkStatus.value = LinkStatus.NONE
+        toast.success(t('detail.leave_success'))
+      } catch (e) {
+        toast.error(t('detail.leave_failed'))
+      }
+      break
+  }
+}
+
 if (error.value) console.error('Room Fetch Error:', error.value)
 
 useHead({
@@ -366,7 +434,11 @@ useHead({
       "share_voice_status": "正在聊天",
       "share_voice_invite": "快来一起参与实时语音互动吧",
       "share_live_status": "正在直播",
-      "share_live_invite": "快来一起参与实时视频互动吧"
+      "share_live_invite": "快来一起参与实时视频互动吧",
+      "cancel_success": "已取消申请",
+      "cancel_failed": "取消失败",
+      "leave_success": "已下麦",
+      "leave_failed": "下麦失败"
     }
   },
   "zh-TW": {
@@ -401,7 +473,11 @@ useHead({
       "share_voice_status": "正在聊天",
       "share_voice_invite": "快來一起參與實時語音互動吧",
       "share_live_status": "正在直播",
-      "share_live_invite": "快來一起參與實時視頻互動吧"
+      "share_live_invite": "快來一起參與實時視頻互動吧",
+      "cancel_success": "已取消申請",
+      "cancel_failed": "取消失敗",
+      "leave_success": "已下麥",
+      "leave_failed": "下麥失敗"
     }
   },
   "en": {
@@ -436,7 +512,11 @@ useHead({
       "share_voice_status": "is chatting",
       "share_voice_invite": "Join the real-time voice interaction",
       "share_live_status": "is live",
-      "share_live_invite": "Join the real-time video interaction"
+      "share_live_invite": "Join the real-time video interaction",
+      "cancel_success": "Request cancelled",
+      "cancel_failed": "Failed to cancel",
+      "leave_success": "Left the mic",
+      "leave_failed": "Failed to leave mic"
     }
   }
 }</i18n>

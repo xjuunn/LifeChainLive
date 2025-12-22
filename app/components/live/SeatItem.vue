@@ -1,5 +1,7 @@
 <template>
-  <div class="relative flex flex-col items-center gap-2 group w-full transition-all duration-300">
+  <div
+    class="relative flex flex-col items-center gap-2 group w-full transition-all duration-300 cursor-pointer"
+    @click="handleClick">
     <div class="relative transition-all duration-300 transform group-hover:scale-105">
       <!-- 头像容器 -->
       <div
@@ -54,11 +56,18 @@
 <script setup lang="ts">
 import type { SeatInfo } from 'tuikit-atomicx-vue3';
 
-
 const props = defineProps<{
   seat: SeatInfo
   isSpeaking: boolean
 }>()
+
+const emit = defineEmits<{
+  click: [seat: SeatInfo, event: MouseEvent]
+}>()
+
+const handleClick = (event: MouseEvent) => {
+  emit('click', props.seat, event)
+}
 
 const { t } = useI18n()
 
