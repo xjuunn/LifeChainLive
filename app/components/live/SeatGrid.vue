@@ -25,6 +25,7 @@
       :position="menuPosition"
       :self-user-id="selfUserId"
       :link-status="linkStatus"
+      :is-muted="isMuted"
       @close="menuVisible = false"
       @action="handleSeatAction"
     />
@@ -43,6 +44,7 @@ const SeatActionMenu = defineAsyncComponent(() => import('./SeatActionMenu.vue')
 const props = defineProps<{
   roomInfo: LiveRoom
   linkStatus: LinkStatus
+  isMuted?: boolean
 }>()
 
 const emit = defineEmits<{

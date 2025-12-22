@@ -39,6 +39,13 @@
 
             <template v-else-if="isSelf">
               <button
+                class="w-full px-4 py-2.5 text-left text-sm hover:bg-base-200 flex items-center gap-2 transition-colors"
+                @click="handleAction('toggleMic')"
+              >
+                <Icon :name="isMuted ? 'mingcute:mic-off-fill' : 'mingcute:mic-fill'" :class="isMuted ? 'text-error' : 'text-success'" />
+                {{ isMuted ? t('seat.unmute') : t('seat.mute') }}
+              </button>
+              <button
                 class="w-full px-4 py-2.5 text-left text-sm hover:bg-base-200 flex items-center gap-2 transition-colors text-error"
                 @click="handleAction('leave')"
               >
@@ -69,6 +76,7 @@ const props = defineProps<{
   position: { x: number; y: number }
   selfUserId: string
   linkStatus: LinkStatus
+  isMuted?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -80,6 +88,7 @@ const { t } = useI18n()
 
 const isEmpty = computed(() => !props.seat.userInfo?.userId)
 const isSelf = computed(() => props.seat.userInfo?.userId === props.selfUserId)
+const isMuted = computed(() => props.isMuted ?? true)
 
 const avatarUrl = computed(() => {
   const url = props.seat.userInfo?.avatarUrl
@@ -111,6 +120,8 @@ const handleAction = (action: string) => {
       "apply": "申请上麦",
       "cancel_apply": "取消申请",
       "leave": "下麦",
+      "mute": "关闭麦克风",
+      "unmute": "开启麦克风",
       "view_only": "点击查看用户",
       "guest": "游客"
     }
@@ -120,6 +131,8 @@ const handleAction = (action: string) => {
       "apply": "申請上麥",
       "cancel_apply": "取消申請",
       "leave": "下麥",
+      "mute": "關閉麥克風",
+      "unmute": "開啟麥克風",
       "view_only": "點擊查看用戶",
       "guest": "遊客"
     }
@@ -129,6 +142,8 @@ const handleAction = (action: string) => {
       "apply": "Request to Speak",
       "cancel_apply": "Cancel Request",
       "leave": "Leave Mic",
+      "mute": "Mute",
+      "unmute": "Unmute",
       "view_only": "View user profile",
       "guest": "Guest"
     }

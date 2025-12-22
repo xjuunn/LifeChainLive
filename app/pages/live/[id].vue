@@ -28,7 +28,7 @@
             </div>
 
             <div class="relative z-20 flex-1 min-h-0">
-              <SeatGrid :room-info="roomInfo" :link-status="linkStatus" @seat-action="handleSeatAction" />
+              <SeatGrid :room-info="roomInfo" :link-status="linkStatus" :is-muted="isMuted" @seat-action="handleSeatAction" />
             </div>
           </div>
         </template>
@@ -269,7 +269,10 @@ const LUXURY_THRESHOLD = 500
 
 const { sendTextMessage } = useBarrageState()
 const { subscribeEvent, unsubscribeEvent, acceptInvitation, rejectInvitation, invitees } = useCoGuestState()
-const { unmuteMicrophone } = useLiveSeatState()
+const { unmuteMicrophone, muteMicrophone } = useLiveSeatState()
+
+// 麦克风状态
+const isMuted = ref(true)
 
 // 邀请上麦相关状态
 const pendingInvitation = ref<{ hostUser: any; requestUserId?: string } | null>(null)
@@ -405,9 +408,26 @@ const handleSeatAction = async (action: string, seat: SeatInfo) => {
       try {
         await LinkMicApi.leaveSeat(roomId.value, userId)
         linkStatus.value = LinkStatus.NONE
+        isMuted.value = true
         toast.success(t('detail.leave_success'))
       } catch (e) {
         toast.error(t('detail.leave_failed'))
+      }
+      break
+    case 'toggleMic':
+      try {
+        if (isMuted.value) {
+          await unmuteMicrophone()
+          isMuted.value = false
+          toast.success(t('detail.mic_on'))
+        } else {
+          await muteMicrophone()
+          isMuted.value = true
+          toast.success(t('detail.mic_off'))
+        }
+      } catch (e) {
+        console.error('切换麦克风失败:', e)
+        toast.error(t('detail.mic_error'))
       }
       break
   }
@@ -436,6 +456,7 @@ const handleApplicationResponded = async (eventInfo: { isAccept: boolean; hostUs
     // 上麦成功后开启麦克风
     try {
       await unmuteMicrophone()
+      isMuted.value = false
       console.log('麦克风已开启')
     } catch (e) {
       console.error('开启麦克风失败:', e)
@@ -464,6 +485,7 @@ const handleAcceptInvitation = async () => {
     // 接受邀请后开启麦克风
     try {
       await unmuteMicrophone()
+      isMuted.value = false
       console.log('麦克风已开启')
     } catch (e) {
       console.error('开启麦克风失败:', e)
@@ -579,7 +601,10 @@ useHead({
       "apply_rejected": "申请被拒绝",
       "kicked_off": "您已被主播下麦",
       "reject": "拒绝",
-      "accept": "接受"
+      "accept": "接受",
+      "mic_on": "麦克风已开启",
+      "mic_off": "麦克风已关闭",
+      "mic_error": "麦克风操作失败"
     }
   },
   "zh-TW": {
@@ -629,7 +654,10 @@ useHead({
       "apply_rejected": "申請被拒絕",
       "kicked_off": "您已被主播下麥",
       "reject": "拒絕",
-      "accept": "接受"
+      "accept": "接受",
+      "mic_on": "麥克風已開啟",
+      "mic_off": "麥克風已關閉",
+      "mic_error": "麥克風操作失敗"
     }
   },
   "en": {
@@ -679,7 +707,10 @@ useHead({
       "apply_rejected": "Request rejected",
       "kicked_off": "You were removed from mic",
       "reject": "Reject",
-      "accept": "Accept"
+      "accept": "Accept",
+      "mic_on": "Microphone is on",
+      "mic_off": "Microphone is off",
+      "mic_error": "Microphone operation failed"
     }
   }
 }</i18n>
