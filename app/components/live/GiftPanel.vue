@@ -3,8 +3,9 @@
     <Transition name="slide-up">
       <div v-if="visible" class="fixed inset-0 z-[100]" @click.self="emit('close')">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
-        
-        <div class="absolute bottom-0 left-0 right-0 bg-base-100 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden pb-safe">
+
+        <div
+          class="absolute bottom-0 left-0 right-0 bg-base-100 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col overflow-hidden pb-safe">
           <div class="flex items-center justify-between p-4 border-b border-base-content/5">
             <div class="flex items-center gap-2">
               <Icon name="mingcute:gift-fill" class="text-xl text-primary" />
@@ -27,19 +28,17 @@
 
           <div v-else class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-4 gap-3">
-              <div
-                v-for="gift in gifts"
-                :key="gift.id"
+              <div v-for="gift in gifts" :key="gift.id"
                 class="flex flex-col items-center p-2 rounded-xl cursor-pointer transition-all duration-200 border-2"
-                :class="selectedGift?.id === gift.id 
-                  ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 scale-105' 
+                :class="selectedGift?.id === gift.id
+                  ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 scale-105'
                   : 'bg-base-200/50 border-transparent hover:bg-base-200 hover:border-base-content/10'"
-                @click="selectGift(gift)"
-              >
+                @click="selectGift(gift)">
                 <div class="relative w-12 h-12 sm:w-14 sm:h-14">
                   <NuxtImg :src="gift.iconUrl" class="w-full h-full object-contain" :alt="gift.name" />
                 </div>
-                <span class="text-xs font-medium text-base-content mt-1.5 truncate w-full text-center">{{ gift.name }}</span>
+                <span class="text-xs font-medium text-base-content mt-1.5 truncate w-full text-center">{{ gift.name
+                  }}</span>
                 <div class="flex items-center gap-0.5 mt-0.5">
                   <Icon name="mingcute:diamond-2-fill" class="text-warning text-xs" />
                   <span class="text-xs font-bold text-warning">{{ gift.price }}</span>
@@ -53,22 +52,14 @@
               <div class="flex items-center gap-2 flex-1">
                 <span class="text-sm text-base-content/60">{{ t('gift.count') }}:</span>
                 <div class="join">
-                  <button
-                    v-for="count in [1, 10, 66, 99]"
-                    :key="count"
-                    class="join-item btn btn-sm"
-                    :class="giftCount === count ? 'btn-primary' : 'btn-ghost'"
-                    @click="giftCount = count"
-                  >
+                  <button v-for="count in [1, 10, 66, 99]" :key="count" class="join-item btn btn-sm"
+                    :class="giftCount === count ? 'btn-primary' : 'btn-ghost'" @click="giftCount = count">
                     {{ count }}
                   </button>
                 </div>
               </div>
-              <button
-                class="btn btn-primary shadow-lg shadow-primary/30 gap-2"
-                :disabled="!selectedGift || sending || !canAfford"
-                @click="handleSend"
-              >
+              <button class="btn btn-primary shadow-lg shadow-primary/30 gap-2"
+                :disabled="!selectedGift || sending || !canAfford" @click="handleSend">
                 <span v-if="sending" class="loading loading-spinner loading-sm"></span>
                 <template v-else>
                   <Icon name="mingcute:send-plane-fill" />
@@ -108,7 +99,7 @@ const toast = useToast()
 const loading = ref(true)
 const sending = ref(false)
 const gifts = ref<Gift[]>([])
-const selectedGift = ref<Gift | null>(null)
+const selectedGift = ref<Gift>()
 const giftCount = ref(1)
 const balance = ref(0)
 
@@ -224,8 +215,8 @@ onMounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.slide-up-enter-active > div:last-child,
-.slide-up-leave-active > div:last-child {
+.slide-up-enter-active>div:last-child,
+.slide-up-leave-active>div:last-child {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -234,8 +225,8 @@ onMounted(() => {
   opacity: 0;
 }
 
-.slide-up-enter-from > div:last-child,
-.slide-up-leave-to > div:last-child {
+.slide-up-enter-from>div:last-child,
+.slide-up-leave-to>div:last-child {
   transform: translateY(100%);
 }
 </style>

@@ -105,7 +105,7 @@
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-scroll relative bg-base-50/50">
+        <div class="flex-1 min-h-0 relative bg-base-50/50">
           <ClientOnly>
             <LiveChatList :owner-id="roomInfo.ownerId" />
           </ClientOnly>
@@ -121,11 +121,11 @@
               <Icon name="mingcute:mic-fill" class="text-xl" />
             </button>
 
-            <button
+            <!-- <button
               class="btn btn-circle btn-ghost h-10 w-10 min-h-0 text-warning hover:bg-warning/10"
               @click="showGiftPanel = true">
               <Icon name="mingcute:gift-fill" class="text-xl" />
-            </button>
+            </button> -->
 
             <div class="relative flex-1 group transition-all duration-300 focus-within:scale-[1.01]">
               <input ref="inputRef" v-model="textContent" type="text" :placeholder="t('detail.say_something')"
@@ -160,7 +160,7 @@
     </div>
 
     <ClientOnly>
-      <GiftPanel
+      <!-- <GiftPanel
         v-if="roomInfo"
         :visible="showGiftPanel"
         :room-id="roomId"
@@ -168,7 +168,7 @@
         :owner-name="roomInfo.ownerNickname"
         @close="showGiftPanel = false"
         @send="handleGiftSend"
-      />
+      /> -->
 
       <GiftLuxury
         :show="luxuryEffect.show"
