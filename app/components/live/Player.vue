@@ -1,6 +1,7 @@
 <template>
   <div class="relative h-full w-full bg-black">
     <LiveView class="h-full w-full object-contain" />
+
     <div v-if="initError"
       class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 text-white">
       <Icon name="mingcute:wifi-off-line" class="text-4xl mb-2 text-error" />
@@ -32,14 +33,15 @@ const initLive = async () => {
   try {
     const { sdkAppId, userId, userSig, roomId } = await appStore.getLivePermission(props.roomId)
 
-    if (sdkAppId && userId && userSig)
+    if (sdkAppId && userId && userSig) {
       await login({
         sdkAppId,
         userId,
         userSig
       })
+    }
 
-    await joinLive({ liveId: String(roomId) })
+    await joinLive({ liveId: roomId })
 
     isJoined = true
     emit('loaded')
