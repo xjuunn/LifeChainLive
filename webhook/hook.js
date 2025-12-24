@@ -3,7 +3,9 @@ import crypto from "crypto";
 import { exec } from "child_process";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+    path: "../.env"
+});
 
 const app = express();
 const PORT = 45678;
