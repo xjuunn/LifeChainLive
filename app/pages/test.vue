@@ -5,23 +5,20 @@
 </template>
 
 <script lang="ts" setup>
+import TencentCloudChat, { ChatSDK } from '@tencentcloud/lite-chat';
+let chatSdk: ChatSDK | null = null;
 async function test() {
-  const data = await useSocket().request('live:list', {
-    page: 1,
-    pageSize: 10
-  })
-  console.log(data);
+
 
 }
 
 onMounted(() => {
-  useSocketEvent('live:room:created', (room) => {
-    console.log('create:', room);
+  chatSdk = TencentCloudChat.create({
+    SDKAppID: 1600113800,
   })
-  useSocketEvent('live:room:ended', (data) => {
-    console.log('close', data);
-  })
-  console.log("初始化监听");
+  chatSdk.on(TencentCloudChat.EVENT.SDK_READY, () => {
+    console.log("ready!!");
 
+  })
 })
 </script>

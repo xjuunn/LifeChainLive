@@ -1,7 +1,7 @@
 <template>
   <div class="relative h-full w-full bg-black">
     <LiveView class="h-full w-full object-contain" />
-
+    
     <div v-if="initError"
       class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 text-white">
       <Icon name="mingcute:wifi-off-line" class="text-4xl mb-2 text-error" />
@@ -37,7 +37,7 @@ const initLive = async () => {
       guestId = `guest_${Math.floor(Math.random() * 10000000)}`
       localStorage.setItem('userId', guestId)
     }
-    
+
     const res = await LiveApi.join(guestId, props.roomId)
     const auth = res.data || res
 
@@ -46,7 +46,7 @@ const initLive = async () => {
     }
 
     console.log('SDK登录, userId:', auth.userId, 'roomId:', auth.roomId)
-    
+
     await login({
       sdkAppId: Number(auth.sdkAppId),
       userId: String(auth.userId),

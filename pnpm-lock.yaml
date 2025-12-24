@@ -29,6 +29,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.2))
+      '@tencentcloud/lite-chat':
+        specifier: ^4.2.0
+        version: 4.2.0
       '@tencentcloud/tui-core':
         specifier: ^2.5.1
         version: 2.5.1
@@ -1869,6 +1872,9 @@ packages:
 
   '@tencentcloud/chat@3.6.1':
     resolution: {integrity: sha512-YKftPfO2Mzo/RhSmUq2806FrB2ZB9AiuVmhHupxXtG6g8RMHTJICQulp6z+3bBzU7qko9BancR8rtvfdpDTpmQ==}
+
+  '@tencentcloud/lite-chat@4.2.0':
+    resolution: {integrity: sha512-tdV+we4Qi786UDuKcbYsdHONBZ27lrENyENZRq6aR5QyVsGK6mU7m2ly0GI57mqwPH9nFbLqoydK5+LjOJgmng==}
 
   '@tencentcloud/tui-core@2.5.1':
     resolution: {integrity: sha512-aXZG0INkV9WvFUHgmVQRibCs10r2u/oVb8qAEjW3maytBiLWOJQiK7dzshK9fnfadJAWQ027cpR8lCKz5r5Tlw==}
@@ -6750,6 +6756,8 @@ snapshots:
   '@tencentcloud/chat@3.5.9': {}
 
   '@tencentcloud/chat@3.6.1': {}
+
+  '@tencentcloud/lite-chat@4.2.0': {}
 
   '@tencentcloud/tui-core@2.5.1':
     dependencies:

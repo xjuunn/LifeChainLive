@@ -6,7 +6,6 @@
       <ClientOnly>
         <LivePlayer :room-id="roomId" @loaded="loading = false" class="absolute inset-0 w-full h-full object-contain"
           :class="{ 'opacity-0 pointer-events-none': isVoiceRoom }" />
-
         <template v-if="roomInfo">
           <div v-if="isVoiceRoom" class="absolute inset-0 z-10 bg-gray-900 flex flex-col">
             <div class="absolute inset-0 overflow-hidden">
@@ -28,7 +27,8 @@
             </div>
 
             <div class="relative z-20 flex-1 min-h-0">
-              <SeatGrid :room-info="roomInfo" :link-status="linkStatus" :is-muted="isMuted" @seat-action="handleSeatAction" />
+              <SeatGrid :room-info="roomInfo" :link-status="linkStatus" :is-muted="isMuted"
+                @seat-action="handleSeatAction" />
             </div>
           </div>
         </template>
@@ -113,11 +113,8 @@
 
         <div class="flex-none border-t border-base-content/5 bg-base-100 p-3 lg:p-4 pb-safe z-10">
           <div class="flex gap-2 items-center relative">
-            <button
-              v-if="isVoiceRoom"
-              class="btn btn-circle btn-ghost h-10 w-10 min-h-0 hover:bg-primary/10"
-              :class="linkStatusButtonClass"
-              @click="showLinkMicPanel = true">
+            <button v-if="isVoiceRoom" class="btn btn-circle btn-ghost h-10 w-10 min-h-0 hover:bg-primary/10"
+              :class="linkStatusButtonClass" @click="showLinkMicPanel = true">
               <Icon name="mingcute:mic-fill" class="text-xl" />
             </button>
 
@@ -170,28 +167,18 @@
         @send="handleGiftSend"
       /> -->
 
-      <GiftLuxury
-        :show="luxuryEffect.show"
-        :gift-icon="luxuryEffect.giftIcon"
-        :gift-name="luxuryEffect.giftName"
-        :sender-name="luxuryEffect.senderName"
-        :gift-count="luxuryEffect.giftCount"
-        @complete="luxuryEffect.show = false"
-      />
+      <GiftLuxury :show="luxuryEffect.show" :gift-icon="luxuryEffect.giftIcon" :gift-name="luxuryEffect.giftName"
+        :sender-name="luxuryEffect.senderName" :gift-count="luxuryEffect.giftCount"
+        @complete="luxuryEffect.show = false" />
 
-      <LinkMicPanel
-        v-if="roomInfo && isVoiceRoom"
-        :visible="showLinkMicPanel"
-        :room-id="roomId"
-        :link-status="linkStatus"
-        @close="showLinkMicPanel = false"
-        @status-change="handleLinkStatusChange"
-      />
+      <LinkMicPanel v-if="roomInfo && isVoiceRoom" :visible="showLinkMicPanel" :room-id="roomId"
+        :link-status="linkStatus" @close="showLinkMicPanel = false" @status-change="handleLinkStatusChange" />
 
       <!-- 邀请上麦弹窗 -->
       <Teleport to="body">
         <Transition name="fade">
-          <div v-if="showInvitationDialog && pendingInvitation" class="fixed inset-0 z-[200] flex items-center justify-center">
+          <div v-if="showInvitationDialog && pendingInvitation"
+            class="fixed inset-0 z-[200] flex items-center justify-center">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="handleRejectInvitation"></div>
             <div class="relative bg-base-100 rounded-2xl shadow-2xl p-6 mx-4 max-w-sm w-full animate-bounce-in">
               <div class="text-center">
@@ -200,7 +187,8 @@
                 </div>
                 <h3 class="text-lg font-bold text-base-content mb-2">{{ t('detail.invitation_title') }}</h3>
                 <p class="text-sm text-base-content/60 mb-1">
-                  <span class="font-medium text-primary">{{ pendingInvitation.hostUser?.userName || t('detail.anchor') }}</span>
+                  <span class="font-medium text-primary">{{ pendingInvitation.hostUser?.userName || t('detail.anchor')
+                  }}</span>
                   {{ t('detail.invitation_desc') }}
                 </p>
                 <p class="text-xs text-base-content/40 mb-6">{{ t('detail.invitation_tip') }}</p>
@@ -236,7 +224,7 @@ definePageMeta({ layout: 'empty' })
 const LivePlayer = defineAsyncComponent(() => import('~/components/live/Player.vue'))
 const LiveChatList = defineAsyncComponent(() => import('~/components/live/ChatList.vue'))
 const SeatGrid = defineAsyncComponent(() => import('~/components/live/SeatGrid.vue'))
-const GiftPanel = defineAsyncComponent(() => import('~/components/live/GiftPanel.vue'))
+// const GiftPanel = defineAsyncComponent(() => import('~/components/live/GiftPanel.vue'))
 const GiftBullet = defineAsyncComponent(() => import('~/components/live/GiftBullet.vue'))
 const GiftLuxury = defineAsyncComponent(() => import('~/components/live/GiftLuxury.vue'))
 const LinkMicPanel = defineAsyncComponent(() => import('~/components/live/LinkMicPanel.vue'))
